@@ -4,7 +4,9 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/config.php';
 
-if (str_contains($config['mongodb_uri'], 'USERNAME') || str_contains($config['mongodb_uri'], 'PASSWORD')) {
+$mongodbUri = strtolower($config['mongodb_uri']);
+
+if (str_contains($mongodbUri, 'username') || str_contains($mongodbUri, 'password')) {
     die('Please update mongodb_uri in config.php first.');
 }
 
