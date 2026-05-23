@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+session_start();
+
+header('Content-Type: application/json');
+
+require __DIR__ . '/../../connect_db/db.php';
+require __DIR__ . '/helpers.php';
+
+requireMethod('POST');
+
+$userId = requireLogin();
+$data = readRequestData();
+
+$title = getRequiredString($data, 'title');
+$content = getRequiredString($data, 'content');
+$imageUrl = getOptionalString($data, 'image_url');
+
+$postObjectId = new MongoDB\BSON\ObjectId();
+$postId = (string) $postObjectId;
+$now = new MongoDB\BSON\UTCDateTime();
+
+$postDocument = [
+    '_id' => $postObjectId,
+    'post_id' => $postId,
+    'user_id' => $userId,
+    'title' => $title,
+    'content' => $content,
+    'image_url' => $imageUrl,
+    'created_at' => $now,
+    'updated_at' => $now,
+    'status' => 'active',
+];
+
+$db->selectCollection('posts')->insertOne($postDocument);
+
+respond(201, [
+    'success' => true,
+    'message' => 'Post created successfully',
+    'post' => postToArray($db, $postDocument, $userId),
+]);
