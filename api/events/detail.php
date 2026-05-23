@@ -35,7 +35,10 @@ function buildEventQuery(string $eventId): array
             ['event_id' => $eventId],
         ],
         'status' => [
-            '$ne' => 'Deleted',
+            '$nin' => ['Deleted', 'deleted', 'DELETED'],
+        ],
+        'deleted_at' => [
+            '$exists' => false,
         ],
     ];
 

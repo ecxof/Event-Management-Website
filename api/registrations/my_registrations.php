@@ -19,6 +19,7 @@ $registrations = $db->selectCollection('registrations');
 $cursor = $registrations->find(
     [
         'user_id' => $userId,
+        'status' => 'joined',
     ],
     [
         'sort' => [
@@ -31,7 +32,11 @@ $registrationList = [];
 
 foreach ($cursor as $registration) {
     $eventId = (string) ($registration['event_id'] ?? '');
-    $event = $eventId !== '' ? $events->findOne(buildEventQuery($eventId, true)) : null;
+    $event = $eventId !== '' ? $events->findOne(buildEventQuery($eventId)) : null;
+
+    if ($event === null) {
+        continue;
+    }
 
     $registrationList[] = [
         ...registrationToArray($registration),

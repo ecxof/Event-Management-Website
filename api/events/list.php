@@ -60,7 +60,10 @@ $registrations = $db->selectCollection('registrations');
 $cursor = $events->find(
     [
         'status' => [
-            '$ne' => 'Deleted',
+            '$nin' => ['Deleted', 'deleted', 'DELETED'],
+        ],
+        'deleted_at' => [
+            '$exists' => false,
         ],
     ],
     [

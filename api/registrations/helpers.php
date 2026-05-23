@@ -75,7 +75,10 @@ function buildEventQuery(string $eventId, bool $includeDeleted = false): array
 
     if (!$includeDeleted) {
         $query['status'] = [
-            '$ne' => 'Deleted',
+            '$nin' => ['Deleted', 'deleted', 'DELETED'],
+        ];
+        $query['deleted_at'] = [
+            '$exists' => false,
         ];
     }
 
