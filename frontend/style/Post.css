@@ -1,0 +1,162 @@
+        :root {
+            --primary-color: #ff4757;      
+            --primary-hover: #ff6b81;     
+            --dark-bg: #0f111a;           
+            --card-bg: #ffffff;           
+            --body-bg: #f8fafc;           
+            --text-main: #2f3542;          
+            --text-light: #747d8c;         
+            --border-color: #e2e8f0;       
+            --font-title: 'Fredoka', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            font-family: var(--font-body);
+            color: var(--text-main);
+        }
+
+        /* 顶部固定导航栏 */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; height: 80px; padding: 0 60px;
+            background-color: #ffffff; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: fixed; top: 0; left: 0; z-index: 1000;
+        }
+        .navbar-brand { font-family: var(--font-title); font-size: 26px; font-weight: 700; color: var(--dark-bg); text-decoration: none; }
+        .navbar-brand span { color: var(--primary-color); }
+        .nav-links { display: flex; align-items: center; gap: 50px; }
+        .nav-links a { text-decoration: none; color: var(--text-main); font-size: 16px; font-weight: 600; position: relative; padding: 8px 0; }
+        .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 3px; background-color: var(--primary-color); border-radius: 2px; transition: width 0.3s; }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-color); }
+        .user-profile-btn {
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+
+        /* 主体页面排版网格 */
+        .main-container {
+            max-width: 1140px; margin: 120px auto 60px auto; padding: 0 20px;
+        }
+        .post-layout-grid {
+            display: table; width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 30px 0; margin-left: -30px;
+        }
+        .left-profile-column, .right-content-column { display: table-cell; vertical-align: top; }
+        .left-profile-column { width: 35%; }  
+        .right-content-column { width: 65%; } 
+
+        .post-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); margin-bottom: 24px;
+        }
+
+        /* 左侧个人信息栏 */
+        .profile-container-card { padding: 30px 20px; text-align: center; }
+        .profile-avatar-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto 16px auto; }
+        .profile-avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 8px 24px rgba(255, 71, 87, 0.2); }
+        .status-badge { position: absolute; bottom: 5px; right: 5px; width: 18px; height: 18px; background-color: #2ed573; border: 3px solid #ffffff; border-radius: 50%; }
+        .profile-name { font-family: var(--font-title); font-size: 22px; font-weight: 700; color: var(--dark-bg); margin-bottom: 6px; }
+        .profile-bio { font-size: 13px; color: var(--text-light); line-height: 1.5; margin-bottom: 20px; padding: 0 10px; }
+        
+        .sidebar-menu { border-top: 1px solid #f1f5f9; padding-top: 15px; text-align: left; }
+        
+        /* 功能标签切换块样式 */
+        .menu-label {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--text-main); font-size: 15px; font-weight: 600; border-radius: 10px;
+            margin-bottom: 6px; cursor: pointer; transition: all 0.2s ease;
+        }
+        .menu-label i { font-size: 16px; width: 20px; color: var(--text-light); }
+        .menu-label:hover { background-color: rgba(255, 71, 87, 0.05); color: var(--primary-color); }
+
+        /* 已 Like 的 Post 列表侧边栏区 */
+        .liked-posts-section { margin-top: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: left; }
+        .section-mini-title { font-family: var(--font-title); font-size: 14px; color: var(--dark-bg); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .section-mini-title i { color: var(--primary-color); }
+        
+        /* 核心修改：点赞缩略卡片，点击任何一个都会触发右侧 “My Like Post” 动态大流面板 */
+        .liked-label-mini {
+            display: flex; align-items: center; gap: 10px; padding: 12px;
+            background-color: #f8fafc; border-radius: 12px; margin-bottom: 8px;
+            cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+        }
+        .liked-label-mini:hover { border-color: var(--primary-color); background-color: #ffffff; transform: translateX(3px); }
+        .liked-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+        .liked-info-text { flex-grow: 1; overflow: hidden; }
+        .liked-title { font-size: 14px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .liked-author { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+
+
+        /* ================= 🎛️ 纯 CSS 核心无线电单选页签控制逻辑 ================= */
+        input[type="radio"].tab-switch { display: none; }
+        .panel-content { display: none; width: 100%; }
+
+        /* 状态 1：当选中 “New Post” 菜单时 */
+        #tab-new-post:checked ~ .main-container .post-layout-grid #label-new-post { background-color: var(--primary-color); color: #ffffff; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.25); }
+        #tab-new-post:checked ~ .main-container .post-layout-grid #label-new-post i { color: #ffffff; }
+        #tab-new-post:checked ~ .main-container .post-layout-grid .right-content-column #panel-new-post { display: block; }
+
+        /* 状态 3：当选中 “Community Post” 菜单时（全站默认首发状态） */
+        #tab-community:checked ~ .main-container .post-layout-grid #label-community { background-color: var(--primary-color); color: #ffffff; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.25); }
+        #tab-community:checked ~ .main-container .post-layout-grid #label-community i { color: #ffffff; }
+        #tab-community:checked ~ .main-container .post-layout-grid .right-content-column #panel-community { display: block; }
+
+        /* 状态 4-1 与 4-2：点击左侧任意一个 Liked 帖子缩略，右侧统一重定向到全量我 Like 过的 Post 动态列表面板 */
+        #tab-liked-posts-1:checked ~ .main-container .post-layout-grid #label-liked-posts-1,
+        #tab-liked-posts-2:checked ~ .main-container .post-layout-grid #label-liked-posts-2 { 
+            border-color: var(--primary-color); background-color: #ffffff; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.08); 
+        }
+        #tab-liked-posts-1:checked ~ .main-container .post-layout-grid .right-content-column #panel-liked-posts-flow,
+        #tab-liked-posts-2:checked ~ .main-container .post-layout-grid .right-content-column #panel-liked-posts-flow { 
+            display: block; 
+        }
+
+
+        /* ================= 右侧数据流展现样式（完全开放用于对接循环） ================= */
+        .database-feed-container { width: 100%; display: flex; flex-direction: column; }
+        .feed-header-title { font-family: var(--font-title); font-size: 24px; font-weight: 700; color: var(--dark-bg); margin-bottom: 4px; text-align: left; }
+        .feed-header-subtitle { font-size: 14px; color: var(--text-light); margin-bottom: 24px; text-align: left; }
+
+        /* 标准的大帖子卡片（你后端循环读取、对接数据库的唯一目标模型） */
+        .feed-item-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); margin-bottom: 24px; width: 100%; }
+        
+        /* 左右栅格并排排版 */
+        .feed-item-inner-grid { display: flex; gap: 20px; align-items: flex-start; }
+        .feed-left-img-box { width: 140px; height: 140px; flex-shrink: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        .feed-left-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .feed-right-info-box { flex-grow: 1; text-align: left; }
+        .feed-post-title { font-family: var(--font-title); font-size: 20px; font-weight: 700; color: var(--dark-bg); margin-bottom: 4px; }
+        .feed-post-meta { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
+        .feed-post-meta span { margin-right: 12px; }
+        
+        /* 详细描述描述块 */
+        .feed-post-description-box { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; font-size: 14px; line-height: 1.5; color: var(--text-main); margin-bottom: 16px; min-height: 70px; }
+        .feed-action-bar { display: flex; align-items: center; gap: 24px; }
+        .action-btn { background: none; border: none; font-family: var(--font-body); font-size: 16px; color: var(--text-light); cursor: pointer; transition: color 0.2s; }
+        .action-btn:hover, .action-btn.active-liked { color: var(--primary-color); }
+
+        /* 发帖表单元素 */
+        .form-group { margin-bottom: 18px; }
+        .form-control { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-body); font-size: 14px; color: var(--text-main); outline: none; }
+        textarea.form-control { resize: vertical; min-height: 140px; }
+        .image-upload-box { border: 2px dashed var(--border-color); border-radius: 10px; padding: 35px 20px; text-align: center; cursor: pointer; background-color: #f8fafc; }
+        .image-upload-box i { font-size: 32px; color: var(--text-light); }
+
+        @media (max-width: 850px) {
+            .post-layout-grid, .left-profile-column, .right-content-column { display: block; width: 100%; }
+            .post-layout-grid { margin-left: 0; border-spacing: 0; }
+            .feed-item-inner-grid { flex-direction: column; }
+            .feed-left-img-box { width: 100%; height: 180px; }
+        }

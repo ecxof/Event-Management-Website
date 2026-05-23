@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Google Fonts 真实生成的 CSS 规则 (包含了 Fredoka 和 Outfit 字体)
+   提示：为了保证在没有安装这些字体的电脑上也能正常显示，
+   如果你是纯离线本地开发，需要下载对应的 .woff2 字体文件并修改下面的 url 路径。
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   OUTFIT 字体家族 (字重: 300, 400, 600, 800)
+   -------------------------------------------------------------------------- */
+
+/* Outfit Light (300) */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/outfit/v11/QkJYTeOR2IL70ncM_n7yObuGv237Ut0u86w.woff2) format('woff2');
+}
+
+/* Outfit Regular (400) */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/outfit/v11/QkJYTeOR2IL70ncM_n7yObuGv237Ut0u8mw.woff2) format('woff2');
+}
+
+/* Outfit SemiBold (600) */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/outfit/v11/QkJYTeOR2IL70ncM_n7yObuGv237Ut0u_6w.woff2) format('woff2');
+}
+
+/* Outfit ExtraBold (800) */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/outfit/v11/QkJYTeOR2IL70ncM_n7yObuGv237Ut0u8aw.woff2) format('woff2');
+}
+
+
+/* --------------------------------------------------------------------------
+   FREDOKA 字体家族 (字重: 400, 600, 700)
+   -------------------------------------------------------------------------- */
+
+/* Fredoka Regular (400) */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/fredoka/v11/SLXMc1g5o96tXMeM-AOTbFFS3mwS-F9bNGo_0vY.woff2) format('woff2');
+}
+
+/* Fredoka SemiBold (600) */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/fredoka/v11/SLXMc1g5o96tXMeM-AOTbFFS3mwS-F9bNLo_0vY.woff2) format('woff2');
+}
+
+/* Fredoka Bold (700) */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/fredoka/v11/SLXMc1g5o96tXMeM-AOTbFFS3mwS-F9bNCo_0vY.woff2) format('woff2');
+}
+
+
+/* ==========================================================================
+   5. 全站基础应用样式规则 (配合上述字体使用)
+   ========================================================================== */
+:root {
+    --font-title: 'Fredoka', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--font-title);
+}

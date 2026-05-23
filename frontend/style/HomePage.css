@@ -1,0 +1,160 @@
+       /* 全局变量与硬核二次元现代风样式 */
+        :root {
+            --primary-color: #ff4757;      /* 主题高亮红/粉 */
+            --primary-hover: #ff6b81;     /* 悬浮状态红 */
+            --dark-bg: #0f111a;           /* 深色背景 */
+            --text-main: #2f3542;          /* 主文字颜色 */
+            --text-light: #747d8c;         /* 辅助浅色文字 */
+            --font-title: 'Fredoka', sans-serif; /* 标题采用圆润有活力的动漫感字体 */
+            --font-body: 'Outfit', sans-serif;   /* 正文采用极简高级感纯净字体 */
+        }
+
+        /* 基础重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: var(--font-body);
+            background-color: #fafafa;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* 1. 顶部固定导航栏 (Navbar) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 80px;
+            padding: 0 60px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        /* 左侧 Website Name */
+        .navbar-brand { font-family: var(--font-title); font-size: 26px; font-weight: 700; color: var(--dark-bg); text-decoration: none; }
+        .navbar-brand span { color: var(--primary-color); }
+        /* 中间群组导航链接 (Home, Event, Post) */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 50px; 
+        }
+
+        .nav-links a { text-decoration: none; color: var(--text-main); font-size: 16px; font-weight: 600; position: relative; padding: 8px 0; }
+        .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 3px; background-color: var(--primary-color); border-radius: 2px; transition: width 0.3s; }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-color); }
+
+        /* 右侧用户头像图标 */
+        .user-profile-btn {
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+
+
+        /* 2. 主视觉通栏看板 (Hero Banner Section) */
+        .hero-section {
+            width: 100%;
+            height: 100vh; 
+            min-height: 600px;
+            /* 💡 提示：这里未来可以换成你自己的本地绝对/相对图片路径，如 url('img/background_Home.jpg') */
+            background: url('background_Homepage.jpg') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed; /* 视差固定背景特效 */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 80px; 
+        }
+
+        /* 暗色半透明遮罩，让中间文字更清晰剔透 */
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 17, 26, 0.75) 0%, rgba(15, 17, 26, 0.45) 100%);
+            backdrop-filter: blur(2px); /* 轻微毛玻璃 */
+            z-index: 1;
+        }
+
+        /* 主体宣传文案包裹框 */
+        .hero-content {
+            position: relative;
+            z-index: 2; 
+            text-align: center;
+            max-width: 850px;
+            padding: 0 20px;
+            color: #ffffff;
+        }
+
+        .hero-content h1 {
+            font-family: var(--font-title);
+            font-size: 4.2rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-shadow: 0px 8px 24px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 1s ease both;
+        }
+
+        .hero-content p {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 48px;
+            text-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        /* 核心要求：Get Started 胶囊按钮 */
+        .btn-get-started {
+            display: inline-block;
+            padding: 16px 48px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px; 
+            box-shadow: 0px 8px 25px rgba(255, 71, 87, 0.4);
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .btn-get-started:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px); 
+            box-shadow: 0px 12px 30px rgba(255, 71, 87, 0.6);
+        }
+
+        /* 淡入上浮动效 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 3. 响应式适配移动端 */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 24px; height: 70px; }
+            .navbar-brand { font-size: 22px; }
+            .nav-links { gap: 20px; }
+            .nav-links a { font-size: 14px; }
+            .hero-content h1 { font-size: 2.6rem; }
+            .hero-content p { font-size: 1.1rem; }
+        }
