@@ -138,6 +138,19 @@ function buildEventQuery(string $eventId): array
     return $query;
 }
 
+function valueToString(mixed $value): ?string
+{
+    if ($value === null) {
+        return null;
+    }
+
+    if ($value instanceof MongoDB\BSON\UTCDateTime) {
+        return $value->toDateTime()->format(DateTimeInterface::ATOM);
+    }
+
+    return (string) $value;
+}
+
 function eventToArray(array|object $event): array
 {
     return [
