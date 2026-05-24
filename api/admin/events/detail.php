@@ -58,6 +58,7 @@ foreach ($cursor as $registration) {
         'user_id' => $userId,
         'username' => $user !== null ? (string) ($user['username'] ?? '') : '',
         'email' => $user !== null ? (string) ($user['email'] ?? '') : '',
+        'telephone' => $user !== null && isset($user['telephone']) ? (string) $user['telephone'] : '',
         'registration_date' => valueToString($registration['registration_date'] ?? null),
         'status' => (string) ($registration['status'] ?? ''),
     ];

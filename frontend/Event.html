@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Anime Exhibition - Events System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style/Event.css">
+    
+</head>
+<body>
+
+    <input type="radio" name="page-tab" id="tab-user-list" class="view-switch" checked> 
+    <input type="radio" name="page-tab" id="tab-my-events" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-event-detail" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-join-form" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-admin-list" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-admin-detail" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-admin-form" class="view-switch">
+    <input type="radio" name="page-tab" id="tab-liked-posts-flow" class="view-switch">
+
+    <nav class="navbar">
+        <a href="HomePage.html" class="navbar-brand">University <span>Anime</span> Exhibition</a>
+        <div class="nav-links">
+            <a href="HomePage.html">Home</a>
+            <a href="Event.html" class="active">Event</a>
+            <a href="Post.html">Post</a>
+        </div>
+        
+        <div style="display: flex; align-items: center;">
+            <a href="Profile.html" class="user-profile-btn" title="Profile"><i class="fa-regular fa-circle-user"></i></a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="event-layout-grid">
+            
+            <div class="left-sidebar-column">
+                <div class="event-card-box profile-container-card">
+                    
+                    <div class="profile-avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150" alt="User Avatar">
+                        <div class="status-badge"></div>
+                    </div>
+                    
+                    <div class="profile-name">Loading...</div>
+                    <div class="profile-bio">Connecting to profile...</div>
+                    
+                    <div class="sidebar-menu">
+                        <label class="menu-label" id="label-all-events" for="tab-user-list"><i class="fa-solid fa-globe"></i> All Events</label>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="right-content-column">
+                <div class="event-card-box" style="border: none; background: transparent; padding: 0; box-shadow: none;">
+                    
+                    <div class="panel-content" id="panel-user-list">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading events...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-my-events">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading registered events...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-event-detail">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading event details...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-join-form">
+                        <div class="event-card-box">
+                            <div class="feed-header-title" style="font-size: 24px;"><i class="fa-regular fa-calendar-check"></i> Select Your Arrival Time</div>
+                            <p class="feed-header-subtitle">Your choice must be strictly confined within the official event timeline boundaries.</p>
+                            
+                            <form id="join-event-form">
+                                <div class="form-group-item">
+                                    <label>Date</label>
+                                    <input type="date" id="join-date" class="form-field" value="2026-06-16" required>
+                                </div>
+                                <div class="form-group-item">
+                                    <label>Time Slot</label>
+                                    <input type="time" id="join-time" class="form-field" value="14:00" required>
+                                </div>
+                                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                    <label class="btn-footer btn-cancel" style="flex:1; cursor:pointer;" for="tab-event-detail">Back</label>
+                                    <button type="submit" class="btn-footer btn-confirm" style="flex:2;">Confirm Entry</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <div class="panel-content" id="panel-admin-list">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading admin events...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-admin-detail">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading participants...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-admin-form">
+                        <div class="event-card-box">
+                            <label class="menu-label" for="tab-admin-list" style="display:inline-flex; width:auto; border:1px solid var(--border-color); padding: 6px 12px; margin-bottom: 20px;"><i class="fa-solid fa-chevron-left"></i> Back</label>
+                            <h2 id="admin-form-title" style="font-family: var(--font-title); text-align: center; font-size: 28px; margin-bottom: 20px;">Plan Your Event</h2>
+                            <div class="form-layout-split">
+                                <div class="form-left-uploader">
+                                    <div class="big-dash-uploader"><i class="fa-regular fa-image"></i><p style="font-size:13px; font-weight:600; margin-top:8px;">Please upload a picture</p></div>
+                                </div>
+                                <div class="form-right-inputs">
+                                    <form id="admin-event-form">
+                                        <input type="hidden" name="event_id">
+                                        <div class="form-group-item"><label>Event Name</label><input type="text" name="title" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Category</label><input type="text" name="category" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Description</label><textarea name="description" class="form-field" required></textarea></div>
+                                        <div class="form-group-item"><label>Location</label><input type="text" name="location" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Date</label><input type="date" name="event_date" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Time</label><input type="time" name="event_time" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Capacity</label><input type="number" name="capacity" min="1" class="form-field" required></div>
+                                        <div class="form-group-item"><label>Image URL</label><input type="url" name="image_url" class="form-field" placeholder="https://example.com/image.jpg"></div>
+                                        <div class="form-group-item"><label>Status</label><select name="status" class="form-field"><option>Upcoming</option><option>Full</option><option>Closed</option></select></div>
+                                        <button type="submit" class="btn-submit-action">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> 
+            </div> 
+            
+        </div> 
+    </div> 
+
+    <script src="js/app.js" defer></script>
+</body>
+</html>

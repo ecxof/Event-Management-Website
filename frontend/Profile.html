@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Anime Exhibition - My Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style/Profile.css">
+    
+</head>
+<body>
+<input type="radio" name="profile-state" id="state-view" class="state-switch" checked> 
+    <input type="radio" name="profile-state" id="state-sent-posts" class="state-switch"> 
+    <input type="radio" name="profile-state" id="state-like-posts" class="state-switch"> 
+    <input type="radio" name="profile-state" id="state-edit" class="state-switch"> 
+    <input type="radio" name="profile-state" id="state-detail-sent" class="state-switch"> 
+    <input type="radio" name="profile-state" id="state-detail-liked" class="state-switch"> 
+
+    <nav class="navbar">
+        <a href="HomePage.html" class="navbar-brand">University <span>Anime</span> Exhibition</a>
+        <div class="nav-links">
+            <a href="HomePage.html">Home</a>
+            <a href="Event.html">Event</a>
+            <a href="Post.html">Post</a>
+        </div>
+        <div class="user-profile">
+            <a href="Profile.html" class="user-profile-btn" title="My Profile"><i class="fa-solid fa-circle-user"></i></a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="profile-layout-grid">
+            
+            <div class="left-sidebar-column">
+                <div class="profile-card sidebar-profile-box">
+                    
+                    <div class="avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150" alt="User Avatar">
+                    </div>
+                    
+                    <div class="profile-name">Loading...</div>
+                    <div class="profile-bio" style="margin-bottom: 25px;">Connecting to profile...</div>
+                    
+                    <div class="sidebar-menu">
+                        <label class="menu-item-link" id="label-my-profile" for="state-view">
+                            <i class="fa-regular fa-user"></i> My Profile
+                        </label>
+                        
+                        <label class="menu-item-link" id="label-sent-posts" for="state-sent-posts">
+                            <i class="fa-regular fa-paper-plane"></i> Sent Post
+                        </label>
+
+                        <label class="menu-item-link" id="label-like-posts" for="state-like-posts">
+                            <i class="fa-regular fa-heart"></i> Like Post
+                        </label>
+                        
+                        <div class="logout-wrapper">
+                            <button type="button" class="menu-item-link btn-logout" onclick="document.getElementById('logoutModal').showModal()">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="right-content-column">
+                
+                <div class="profile-card state-display-panel" id="panel-view-mode">
+                    <div class="section-title"><i class="fa-regular fa-user"></i> My Profile</div>
+                    <div class="info-display-group">
+                        <div class="info-display-label">Username</div>
+                        <div class="info-display-value">Loading...</div>
+                    </div>
+                    <div class="info-display-group">
+                        <div class="info-display-label">Bio</div>
+                        <div class="info-display-value bio-text">Connecting to profile...</div>
+                    </div>
+                    <div class="form-row-grid" style="margin-bottom: 0;">
+                        <div class="form-item-block info-display-group">
+                            <div class="info-display-label">Email Address</div>
+                            <div class="info-display-value">Loading...</div>
+                        </div>
+                        <div class="form-item-block info-display-group">
+                            <div class="info-display-label">Phone Number</div>
+                            <div class="info-display-value">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="action-buttons-row" style="margin-top: 25px;">
+                        <label class="btn-profile-action btn-edit" for="state-edit"><i class="fa-regular fa-pen-to-square" style="margin-right: 8px;"></i> Edit</label>
+                    </div>
+                </div>
+
+                <div class="profile-card state-display-panel" id="panel-edit-mode">
+                    <div class="section-title"><i class="fa-regular fa-id-card"></i> Profile Details</div>
+                    <form id="profile-edit-form">
+                        <div class="form-row-grid"><div class="form-item-block"><label>Username</label><input type="text" name="username" class="profile-input" required></div></div>
+                        <div class="form-row-grid"><div class="form-item-block"><label>Anime Interest</label><textarea name="anime_interest" class="profile-input"></textarea></div></div>
+                        <div class="form-row-grid">
+                            <div class="form-item-block"><label>Email Address</label><input type="email" name="email" class="profile-input" required></div>
+                            <div class="form-item-block"><label>Phone Number</label><input type="text" name="telephone" class="profile-input"></div>
+                        </div>
+                        <div class="action-buttons-row" style="margin-top: 25px;">
+                            <label class="btn-profile-action btn-back" for="state-view">Back</label>
+                            <button type="submit" class="btn-profile-action btn-save">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="state-display-panel" id="panel-sent-posts">
+                    <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading sent posts...</div></div>
+                </div>
+
+                <div class="state-display-panel" id="panel-like-posts">
+                    <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading liked posts...</div></div>
+                </div>
+
+                <div class="state-display-panel" id="panel-detail-sent">
+                    <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading post details...</div></div>
+                </div>
+
+                <div class="state-display-panel" id="panel-detail-liked">
+                    <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading post details...</div></div>
+                </div>
+
+            </div> </div> 
+    </div> 
+
+    <dialog id="logoutModal" class="logout-dialog">
+        <div class="dialog-title"><i class="fa-solid fa-circle-question" style="color: #ff4757; margin-right: 6px;"></i> Logout Confirmation</div>
+        <div class="dialog-msg">Are you sure you want to sign out?</div>
+        <div class="dialog-buttons">
+            <button type="button" class="btn-dialog btn-no" onclick="document.getElementById('logoutModal').close()">No</button>
+            <a href="Login.html" id="logout-confirm" class="btn-dialog btn-yes">Yes</a>
+        </div>
+    </dialog>
+
+    <script src="js/app.js" defer></script>
+</body>
+</html>

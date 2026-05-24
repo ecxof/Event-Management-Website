@@ -115,7 +115,7 @@
                 color: #1900ff;
                 font-weight: bolder;
             }
-            input[type="text"], input[type="password"] {
+            input[type="email"], input[type="password"] {
                 width: 100%;
                 padding: 12px;
                 margin-top: 6px;
@@ -126,8 +126,19 @@
                 font-size: 14px;
                 outline: none;
             }
-            input[type="text"]:focus, input[type="password"]:focus {
+            input[type="email"]:focus, input[type="password"]:focus {
                 border-color: #a8a8a8; 
+            }
+            .form-message {
+                min-height: 20px;
+                margin: 10px 0;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1877f2;
+                text-align: left;
+            }
+            .form-message[data-type="error"] {
+                color: #ff4757;
             }
             input[type="submit"] {
                 width: 100%;
@@ -182,8 +193,8 @@
                     <h2>Login</h2>
                     <form>
                         <div class="input-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" required>
+                            <label for="username">Email</label>
+                            <input type="email" id="username" name="email" required>
                         </div>
                         
                         <div class="input-group">
@@ -191,6 +202,7 @@
                             <input type="password" id="password" name="password" required>
                         </div>
                         <p style="margin-top: 25px; text-align: left;"><a href="Register.html">If you don't have an account, click here</a></p>
+                        <div id="form-message" class="form-message" aria-live="polite"></div>
 
                         <input type="submit" value="Login">
                     </form>
@@ -198,5 +210,6 @@
             </div>
 
         </div>
+        <script src="js/app.js" defer></script>
     </body>
 </html>

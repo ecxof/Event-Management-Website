@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
+        <title>Register</title>
         <style>
             /* 全局重置，防止出现意外的滚动条 */
             html, body {
@@ -144,6 +144,17 @@
             input[type="submit"]:hover {
                 background-color: #1877f2;
             }
+            .form-message {
+                min-height: 20px;
+                margin: 10px 0;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1877f2;
+                text-align: left;
+            }
+            .form-message[data-type="error"] {
+                color: #ff4757;
+            }
 
             .register_logo {
                 width: 100%;
@@ -206,6 +217,7 @@
                             <input type="tel" id="phone" name="phone" required>
                         </div>
                         <p style="margin-top: 25px; text-align: left;"><a href="Login.html">Already have an account? Login here</a></p>
+                        <div id="form-message" class="form-message" aria-live="polite"></div>
 
                         <input type="submit" value="Register">
                     </form>
@@ -213,5 +225,6 @@
             </div>
 
         </div>
+        <script src="js/app.js" defer></script>
     </body>
 </html>

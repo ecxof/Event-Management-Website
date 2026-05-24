@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Anime Exhibition - Post Section</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style/Post.css">
+
+</head>
+<body>
+
+    <input type="radio" name="page-tab" id="tab-new-post" class="tab-switch">
+    <input type="radio" name="page-tab" id="tab-community" class="tab-switch" checked> 
+    <input type="radio" name="page-tab" id="tab-liked-posts-1" class="tab-switch">
+    <input type="radio" name="page-tab" id="tab-liked-posts-2" class="tab-switch">
+
+    <nav class="navbar">
+        <a href="HomePage.html" class="navbar-brand">University <span>Anime</span> Exhibition</a>
+        <div class="nav-links">
+            <a href="HomePage.html">Home</a>
+            <a href="Event.html">Event</a>
+            <a href="Post.html" class="active">Post</a>
+        </div>
+        <div class="user-profile">
+            <a href="Profile.html" class="user-profile-btn" title="Profile"><i class="fa-regular fa-circle-user"></i></a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="post-layout-grid">
+            
+            <div class="left-profile-column">
+                <div class="post-card profile-container-card">
+                    
+                    <div class="profile-avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150" alt="User Avatar">
+                        <div class="status-badge"></div>
+                    </div>
+                    
+                    <div class="profile-name">Loading...</div>
+                    <div class="profile-bio">Connecting to profile...</div>
+                    
+                    <div class="sidebar-menu">
+                        <label class="menu-label" id="label-new-post" for="tab-new-post"><i class="fa-solid fa-square-plus"></i> New Post</label>
+                        <label class="menu-label" id="label-community" for="tab-community"><i class="fa-solid fa-globe"></i> Community Post</label>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="right-content-column">
+                <div class="database-feed-container">
+                    
+                    <div class="panel-content" id="panel-new-post">
+                        <div class="feed-item-card">
+                            <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> Share New Update</div>
+                            <form id="new-post-form">
+                                <div class="form-group"><input type="text" name="title" class="form-control" placeholder="Post title" required></div>
+                                <div class="form-group"><textarea name="content" class="form-control" placeholder="Write something here... What's on your mind?" required></textarea></div>
+                                <div class="form-group">
+                                    <input type="url" name="image_url" class="form-control" placeholder="Image URL (optional)">
+                                </div>
+                                <button type="submit" class="btn-submit-post">Publish</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+
+                    <div class="panel-content" id="panel-community">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading community posts...</div></div>
+                    </div>
+
+                    <div class="panel-content" id="panel-liked-posts-flow">
+                        <div class="loading-card" aria-live="polite"><div class="pixel-stage" aria-hidden="true"><div class="pixel-runner"><span class="runner-head"></span><span class="runner-body"></span><span class="runner-tail"></span><span class="runner-leg runner-leg-a"></span><span class="runner-leg runner-leg-b"></span></div><div class="pixel-ground"></div></div><div class="loading-copy">Loading liked posts...</div></div>
+                    </div> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+
+    <script src="js/app.js" defer></script>
+</body>
+</html>

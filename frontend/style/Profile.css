@@ -117,9 +117,11 @@
         .feed-post-meta span { margin-right: 12px; }
         .feed-post-description-box { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; font-size: 14px; line-height: 1.5; color: var(--text-main); margin-bottom: 12px; min-height: 60px; }
         
-        .feed-action-bar { display: flex; align-items: center; gap: 24px; }
-        .action-btn { background: none; border: none; font-size: 16px; color: var(--text-light); cursor: pointer; }
-        .action-btn.active-liked { color: var(--primary-color); }
+        .feed-action-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; }
+        .action-btn { background: none; border: none; font-size: 16px; color: var(--text-light); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .action-btn:hover, .action-btn.active-liked { color: var(--primary-color); }
+        .inline-link { background: none; border: none; color: var(--primary-color); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; }
+        .inline-link:hover { text-decoration: underline; }
 
         /* 点击进入详情页的专属小按钮 */
         .btn-view-detail { position: absolute; right: 0; top: 0; padding: 8px 16px; background-color: #f1f5f9; color: var(--text-main); font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; text-align: center; }
@@ -141,6 +143,38 @@
         .btn-dialog { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: var(--font-body); text-align: center; text-decoration: none; }
         .btn-dialog.btn-yes { background-color: #ff4757; color: #ffffff; }
         .btn-dialog.btn-no { background-color: var(--gray-btn); color: #ffffff; }
+        .api-dialog { border: none; border-radius: 20px; padding: 32px; width: 90%; max-width: 580px; margin: auto; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15); font-family: var(--font-body); background-color: #ffffff; color: var(--text-main); }
+        .api-dialog::backdrop { background-color: rgba(15, 17, 26, 0.6); backdrop-filter: blur(4px); }
+        .api-dialog .dialog-body { text-align: left; }
+        .api-dialog .dialog-buttons { margin-top: 24px; }
+        .dialog-field { display: block; margin-bottom: 16px; font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .dialog-field span { display: block; margin-bottom: 8px; }
+        .dialog-input { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-body); font-size: 14px; color: var(--text-main); outline: none; }
+        textarea.dialog-input { resize: vertical; min-height: 110px; }
+        .dialog-inline-message { min-height: 18px; color: var(--primary-color); font-size: 13px; font-weight: 700; }
+        .comments-box { border-top: 1px solid #f1f5f9; margin-top: 18px; padding-top: 18px; text-align: left; }
+        .comments-box h3 { font-family: var(--font-title); font-size: 16px; margin-bottom: 10px; color: var(--text-main); }
+        .comment-row { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+        .comment-row strong { display: block; color: var(--dark-bg); margin-bottom: 3px; }
+        .post-comments-preview { border-top: 1px solid #f1f5f9; margin-top: 18px; padding-top: 14px; text-align: left; }
+        .comments-preview-title { font-family: var(--font-title); font-size: 14px; font-weight: 700; color: var(--dark-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .comments-preview-title i { color: var(--primary-color); }
+
+        .loading-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); margin-bottom: 24px; text-align: center; overflow: hidden; }
+        .pixel-stage { position: relative; width: 100%; height: 96px; margin: 0 auto 14px auto; overflow: hidden; background: linear-gradient(#ffffff, #f8fafc); border: 1px solid #f1f5f9; border-radius: 12px; }
+        .pixel-ground { position: absolute; left: 0; right: 0; bottom: 24px; height: 3px; background: repeating-linear-gradient(90deg, var(--text-light) 0 16px, transparent 16px 26px); animation: loadingGround 0.55s linear infinite; opacity: 0.45; }
+        .pixel-runner { position: absolute; left: 34px; bottom: 27px; width: 42px; height: 42px; animation: runnerHop 0.5s ease-in-out infinite; }
+        .pixel-runner span { position: absolute; display: block; background: var(--primary-color); image-rendering: pixelated; }
+        .runner-head { width: 14px; height: 14px; right: 4px; top: 4px; box-shadow: 8px 3px 0 var(--primary-color), 3px 3px 0 #fff; }
+        .runner-body { width: 21px; height: 17px; left: 8px; top: 18px; }
+        .runner-tail { width: 10px; height: 5px; left: 0; top: 20px; transform: skewY(-20deg); }
+        .runner-leg { width: 5px; height: 11px; bottom: 0; animation: runnerLeg 0.32s steps(2) infinite; }
+        .runner-leg-a { left: 12px; }
+        .runner-leg-b { left: 24px; animation-delay: 0.16s; }
+        .loading-copy { font-size: 14px; font-weight: 700; color: var(--text-light); }
+        @keyframes loadingGround { from { transform: translateX(0); } to { transform: translateX(-26px); } }
+        @keyframes runnerHop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes runnerLeg { 0% { transform: translateY(0); } 100% { transform: translateY(5px); } }
 
 
         /* ===================== 🎛️ 纯高级 CSS 多维联动视图引擎（零 JS） ===================== */
@@ -166,8 +200,9 @@
         /* 规则 4：Edit Mode 编辑表单展示控制 */
         #state-edit:checked ~ .main-container .profile-layout-grid .right-content-column #panel-edit-mode { display: block; }
 
-        /* 规则 5：单条点赞帖子详情页面展示控制 */
-        #state-post-detail:checked ~ .main-container .profile-layout-grid .right-content-column #panel-single-post-detail { display: block; }
+        /* 规则 5：单条帖子详情页面展示控制 */
+        #state-detail-sent:checked ~ .main-container .profile-layout-grid .right-content-column #panel-detail-sent { display: block; }
+        #state-detail-liked:checked ~ .main-container .profile-layout-grid .right-content-column #panel-detail-liked { display: block; }
 
         @media (max-width: 850px) {
             .profile-layout-grid, .left-sidebar-column, .right-content-column { display: block; width: 100%; }

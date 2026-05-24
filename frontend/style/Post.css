@@ -80,24 +80,6 @@
         .menu-label i { font-size: 16px; width: 20px; color: var(--text-light); }
         .menu-label:hover { background-color: rgba(255, 71, 87, 0.05); color: var(--primary-color); }
 
-        /* 已 Like 的 Post 列表侧边栏区 */
-        .liked-posts-section { margin-top: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: left; }
-        .section-mini-title { font-family: var(--font-title); font-size: 14px; color: var(--dark-bg); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-        .section-mini-title i { color: var(--primary-color); }
-        
-        /* 核心修改：点赞缩略卡片，点击任何一个都会触发右侧 “My Like Post” 动态大流面板 */
-        .liked-label-mini {
-            display: flex; align-items: center; gap: 10px; padding: 12px;
-            background-color: #f8fafc; border-radius: 12px; margin-bottom: 8px;
-            cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
-        }
-        .liked-label-mini:hover { border-color: var(--primary-color); background-color: #ffffff; transform: translateX(3px); }
-        .liked-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
-        .liked-info-text { flex-grow: 1; overflow: hidden; }
-        .liked-title { font-size: 14px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .liked-author { font-size: 11px; color: var(--text-light); margin-top: 3px; }
-
-
         /* ================= 🎛️ 纯 CSS 核心无线电单选页签控制逻辑 ================= */
         input[type="radio"].tab-switch { display: none; }
         .panel-content { display: none; width: 100%; }
@@ -112,11 +94,6 @@
         #tab-community:checked ~ .main-container .post-layout-grid #label-community i { color: #ffffff; }
         #tab-community:checked ~ .main-container .post-layout-grid .right-content-column #panel-community { display: block; }
 
-        /* 状态 4-1 与 4-2：点击左侧任意一个 Liked 帖子缩略，右侧统一重定向到全量我 Like 过的 Post 动态列表面板 */
-        #tab-liked-posts-1:checked ~ .main-container .post-layout-grid #label-liked-posts-1,
-        #tab-liked-posts-2:checked ~ .main-container .post-layout-grid #label-liked-posts-2 { 
-            border-color: var(--primary-color); background-color: #ffffff; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.08); 
-        }
         #tab-liked-posts-1:checked ~ .main-container .post-layout-grid .right-content-column #panel-liked-posts-flow,
         #tab-liked-posts-2:checked ~ .main-container .post-layout-grid .right-content-column #panel-liked-posts-flow { 
             display: block; 
@@ -143,9 +120,11 @@
         
         /* 详细描述描述块 */
         .feed-post-description-box { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; font-size: 14px; line-height: 1.5; color: var(--text-main); margin-bottom: 16px; min-height: 70px; }
-        .feed-action-bar { display: flex; align-items: center; gap: 24px; }
-        .action-btn { background: none; border: none; font-family: var(--font-body); font-size: 16px; color: var(--text-light); cursor: pointer; transition: color 0.2s; }
+        .feed-action-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; }
+        .action-btn { background: none; border: none; font-family: var(--font-body); font-size: 16px; color: var(--text-light); cursor: pointer; transition: color 0.2s; display: inline-flex; align-items: center; gap: 5px; }
         .action-btn:hover, .action-btn.active-liked { color: var(--primary-color); }
+        .inline-link { background: none; border: none; color: var(--primary-color); font-family: var(--font-body); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; }
+        .inline-link:hover { text-decoration: underline; }
 
         /* 发帖表单元素 */
         .form-group { margin-bottom: 18px; }
@@ -153,10 +132,54 @@
         textarea.form-control { resize: vertical; min-height: 140px; }
         .image-upload-box { border: 2px dashed var(--border-color); border-radius: 10px; padding: 35px 20px; text-align: center; cursor: pointer; background-color: #f8fafc; }
         .image-upload-box i { font-size: 32px; color: var(--text-light); }
+        .btn-submit-post { padding: 12px 30px; background-color: var(--primary-color); color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: var(--font-body); }
+        .btn-submit-post:hover { background-color: var(--primary-hover); }
+
+        .api-dialog { border: none; border-radius: 20px; padding: 30px; width: 90%; max-width: 560px; margin: auto; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15); font-family: var(--font-body); background-color: #ffffff; color: var(--text-main); }
+        .api-dialog::backdrop { background-color: rgba(15, 17, 26, 0.6); backdrop-filter: blur(4px); }
+        .dialog-title { font-family: var(--font-title); font-size: 22px; color: var(--dark-bg); margin-bottom: 16px; }
+        .dialog-body { text-align: left; }
+        .dialog-buttons { display: flex; gap: 15px; justify-content: flex-end; margin-top: 24px; }
+        .btn-dialog { padding: 12px 18px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font-body); text-align: center; text-decoration: none; }
+        .btn-dialog.btn-yes { background-color: var(--primary-color); color: #ffffff; }
+        .btn-dialog.btn-no { background-color: #a4b0be; color: #ffffff; }
+        .dialog-field { display: block; margin-bottom: 16px; font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .dialog-field span { display: block; margin-bottom: 8px; }
+        .dialog-input { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-body); font-size: 14px; color: var(--text-main); outline: none; }
+        textarea.dialog-input { resize: vertical; min-height: 110px; }
+        .dialog-inline-message { min-height: 18px; color: var(--primary-color); font-size: 13px; font-weight: 700; }
+        .comments-box { border-top: 1px solid #f1f5f9; margin-top: 18px; padding-top: 18px; }
+        .comments-box h3 { font-family: var(--font-title); font-size: 16px; margin-bottom: 10px; color: var(--text-main); }
+        .comment-row { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+        .comment-row strong { display: block; color: var(--dark-bg); margin-bottom: 3px; }
+        .post-comments-preview { border-top: 1px solid #f1f5f9; margin-top: 18px; padding-top: 14px; text-align: left; }
+        .comments-preview-title { font-family: var(--font-title); font-size: 14px; font-weight: 700; color: var(--dark-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .comments-preview-title i { color: var(--primary-color); }
+        .post-detail-hero-flex { display: flex; gap: 20px; align-items: flex-start; }
+        .post-detail-big-cover { width: 180px; height: 150px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color); }
+        .post-detail-info-sheet { flex: 1; }
+
+        .loading-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); margin-bottom: 24px; text-align: center; overflow: hidden; }
+        .pixel-stage { position: relative; width: 100%; height: 96px; margin: 0 auto 14px auto; overflow: hidden; background: linear-gradient(#ffffff, #f8fafc); border: 1px solid #f1f5f9; border-radius: 12px; }
+        .pixel-ground { position: absolute; left: 0; right: 0; bottom: 24px; height: 3px; background: repeating-linear-gradient(90deg, var(--text-light) 0 16px, transparent 16px 26px); animation: loadingGround 0.55s linear infinite; opacity: 0.45; }
+        .pixel-runner { position: absolute; left: 34px; bottom: 27px; width: 42px; height: 42px; animation: runnerHop 0.5s ease-in-out infinite; }
+        .pixel-runner span { position: absolute; display: block; background: var(--primary-color); image-rendering: pixelated; }
+        .runner-head { width: 14px; height: 14px; right: 4px; top: 4px; box-shadow: 8px 3px 0 var(--primary-color), 3px 3px 0 #fff; }
+        .runner-body { width: 21px; height: 17px; left: 8px; top: 18px; }
+        .runner-tail { width: 10px; height: 5px; left: 0; top: 20px; transform: skewY(-20deg); }
+        .runner-leg { width: 5px; height: 11px; bottom: 0; animation: runnerLeg 0.32s steps(2) infinite; }
+        .runner-leg-a { left: 12px; }
+        .runner-leg-b { left: 24px; animation-delay: 0.16s; }
+        .loading-copy { font-size: 14px; font-weight: 700; color: var(--text-light); }
+        @keyframes loadingGround { from { transform: translateX(0); } to { transform: translateX(-26px); } }
+        @keyframes runnerHop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes runnerLeg { 0% { transform: translateY(0); } 100% { transform: translateY(5px); } }
 
         @media (max-width: 850px) {
             .post-layout-grid, .left-profile-column, .right-content-column { display: block; width: 100%; }
             .post-layout-grid { margin-left: 0; border-spacing: 0; }
             .feed-item-inner-grid { flex-direction: column; }
             .feed-left-img-box { width: 100%; height: 180px; }
+            .post-detail-hero-flex { flex-direction: column; }
+            .post-detail-big-cover { width: 100%; height: 180px; }
         }
