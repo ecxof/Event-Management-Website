@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Admin update-event endpoint: edits event fields for an existing event.
+
 requireMethod('POST');
 requireAdmin();
 
@@ -17,6 +19,7 @@ $eventId = getRequiredString($data, 'event_id');
 
 $updates = [];
 
+// Text fields are optional for partial updates, but non-image fields cannot be empty when provided.
 $stringFields = [
     'title',
     'category',
@@ -42,6 +45,7 @@ foreach ($stringFields as $field) {
     }
 }
 
+// Capacity and status have stricter validation handled by helper functions.
 if (array_key_exists('capacity', $data)) {
     $updates['capacity'] = getCapacity($data, true);
 }
@@ -57,6 +61,7 @@ if ($updates === []) {
     ]);
 }
 
+// updated_at records when the admin last changed this event.
 $updates['updated_at'] = new MongoDB\BSON\UTCDateTime();
 
 $events = $db->selectCollection('events');

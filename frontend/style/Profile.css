@@ -123,6 +123,22 @@
         .inline-link { background: none; border: none; color: var(--primary-color); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; }
         .inline-link:hover { text-decoration: underline; }
 
+        .public-profile-header { display: flex; justify-content: center; margin-bottom: 18px; }
+        .public-profile-avatar { width: 108px; height: 108px; border-radius: 50%; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 10px 30px rgba(255, 71, 87, 0.22); background-color: #f8fafc; }
+        .public-profile-fields { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 18px; }
+        .public-profile-field { padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 12px; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+        .public-profile-field span { display: block; margin-bottom: 5px; font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        .public-profile-field strong { display: block; font-size: 16px; line-height: 1.35; color: var(--dark-bg); }
+        .public-profile-post-count { margin: 18px 0 12px; padding-top: 14px; border-top: 1px solid #f1f5f9; font-size: 13px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; }
+
+        .pagination-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 6px 0 24px; padding: 14px 16px; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); }
+        .pagination-summary { font-size: 13px; font-weight: 700; color: var(--text-light); white-space: nowrap; }
+        .pagination-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+        .pagination-btn { min-width: 38px; height: 36px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 8px; background-color: #ffffff; color: var(--text-main); font-family: var(--font-body); font-size: 13px; font-weight: 800; cursor: pointer; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+        .pagination-btn:hover:not(:disabled), .pagination-btn.is-active { background-color: var(--primary-color); border-color: var(--primary-color); color: #ffffff; }
+        .pagination-btn:disabled { cursor: not-allowed; opacity: 0.45; }
+        .pagination-ellipsis { min-width: 20px; text-align: center; color: var(--text-light); font-weight: 800; }
+
         /* 点击进入详情页的专属小按钮 */
         .btn-view-detail { position: absolute; right: 0; top: 0; padding: 8px 16px; background-color: #f1f5f9; color: var(--text-main); font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; text-align: center; }
         .btn-view-detail:hover { background-color: var(--blue-accent); color: #ffffff; }
@@ -209,4 +225,7 @@
             .profile-layout-grid { margin-left: 0; border-spacing: 0; }
             .form-row-grid, .utilities-grid, .feed-item-inner-grid, .post-detail-hero-flex { flex-direction: column; gap: 18px; }
             .feed-left-img-box, .post-detail-big-cover { width: 100%; height: 160px; }
+            .pagination-bar { align-items: flex-start; flex-direction: column; }
+            .pagination-summary { white-space: normal; }
+            .pagination-actions { justify-content: flex-start; }
         }

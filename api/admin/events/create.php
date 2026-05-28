@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Admin create-event endpoint: creates a new event from admin form data.
+
 requireMethod('POST');
 requireAdmin();
 
@@ -24,6 +26,7 @@ $capacity = getCapacity($data, true);
 $imageUrl = getOptionalString($data, 'image_url');
 $status = getStatus($data, false) ?? 'Upcoming';
 
+// Deleted is only valid for existing events that are removed later.
 if ($status === 'Deleted') {
     respond(422, [
         'success' => false,
@@ -35,6 +38,7 @@ $events = $db->selectCollection('events');
 $eventObjectId = new MongoDB\BSON\ObjectId();
 $eventId = (string) $eventObjectId;
 
+// image_url stores the Cloudinary URL returned by the upload API.
 $eventDocument = [
     '_id' => $eventObjectId,
     'event_id' => $eventId,

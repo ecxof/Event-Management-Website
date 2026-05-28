@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Read JSON request bodies when the client sends JSON, otherwise fall back to normal form data.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -18,6 +19,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send one JSON response and stop the script so endpoints cannot continue after an error.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -25,6 +27,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Ensure the endpoint is called with the expected HTTP method.
 function requireMethod(string $method): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== $method) {
@@ -35,6 +38,7 @@ function requireMethod(string $method): void
     }
 }
 
+// Require an active logged-in session and return the current user's id.
 function requireLogin(): string
 {
     if (!isset($_SESSION['user_id'])) {
@@ -47,11 +51,13 @@ function requireLogin(): string
     return (string) $_SESSION['user_id'];
 }
 
+// Check whether the current session belongs to an admin user.
 function isAdmin(): bool
 {
     return ($_SESSION['role'] ?? '') === 'admin';
 }
 
+// Read and validate a required non-empty string field from request data.
 function getRequiredString(array $data, string $field): string
 {
     $value = trim((string) ($data[$field] ?? ''));
@@ -66,11 +72,13 @@ function getRequiredString(array $data, string $field): string
     return $value;
 }
 
+// Read an optional string field while normalizing whitespace.
 function getOptionalString(array $data, string $field): string
 {
     return trim((string) ($data[$field] ?? ''));
 }
 
+// Build a MongoDB query that can find a post by custom post_id or ObjectId.
 function buildPostQuery(string $postId, bool $includeDeleted = false): array
 {
     $query = [
@@ -90,6 +98,7 @@ function buildPostQuery(string $postId, bool $includeDeleted = false): array
     return $query;
 }
 
+// Convert MongoDB date values to strings that the frontend can safely display.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -103,6 +112,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Return the small author object shown on post cards and comments.
 function userSummary(MongoDB\Database $db, string $userId): array
 {
     $user = $db->selectCollection('users')->findOne(['user_id' => $userId]);
@@ -119,9 +129,11 @@ function userSummary(MongoDB\Database $db, string $userId): array
         'user_id' => (string) ($user['user_id'] ?? $userId),
         'username' => (string) ($user['username'] ?? ''),
         'email' => (string) ($user['email'] ?? ''),
+        'avatar_url' => (string) ($user['avatar_url'] ?? ''),
     ];
 }
 
+// Convert a MongoDB post document into the API response shape expected by the frontend.
 function postToArray(MongoDB\Database $db, array|object $post, ?string $currentUserId = null): array
 {
     $postId = (string) ($post['post_id'] ?? $post['_id']);
@@ -160,6 +172,7 @@ function postToArray(MongoDB\Database $db, array|object $post, ?string $currentU
     ];
 }
 
+// Convert a comment document into a frontend-friendly API object.
 function commentToArray(MongoDB\Database $db, array|object $comment): array
 {
     $userId = (string) ($comment['user_id'] ?? '');
@@ -176,6 +189,7 @@ function commentToArray(MongoDB\Database $db, array|object $comment): array
     ];
 }
 
+// Load a post or respond with 404 when the requested post does not exist.
 function requirePost(MongoDB\Database $db, string $postId, bool $includeDeleted = false): array|object
 {
     $post = $db->selectCollection('posts')->findOne(buildPostQuery($postId, $includeDeleted));
@@ -190,6 +204,7 @@ function requirePost(MongoDB\Database $db, string $postId, bool $includeDeleted 
     return $post;
 }
 
+// Only allow the original post owner or an admin to edit/delete a post.
 function requirePostOwnerOrAdmin(array|object $post, string $userId): void
 {
     if ((string) ($post['user_id'] ?? '') !== $userId && !isAdmin()) {

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Read JSON request bodies when present, otherwise support regular form data.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -18,6 +19,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send one JSON response and stop the current API script.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -25,6 +27,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Ensure an endpoint is called with the expected HTTP method.
 function requireMethod(string $method): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== $method) {
@@ -35,6 +38,7 @@ function requireMethod(string $method): void
     }
 }
 
+// Require a logged-in user and return their user_id.
 function requireLogin(): string
 {
     if (!isset($_SESSION['user_id'])) {
@@ -47,6 +51,7 @@ function requireLogin(): string
     return (string) $_SESSION['user_id'];
 }
 
+// Convert MongoDB date values into strings for JSON responses.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -60,6 +65,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Convert a user document into the profile object used by Profile pages.
 function userToProfile(array|object $user): array
 {
     return [
@@ -69,11 +75,13 @@ function userToProfile(array|object $user): array
         'role' => (string) ($user['role'] ?? 'user'),
         'anime_interest' => $user['anime_interest'] ?? '',
         'telephone' => $user['telephone'] ?? null,
+        'avatar_url' => (string) ($user['avatar_url'] ?? ''),
         'created_at' => valueToString($user['created_at'] ?? null),
         'updated_at' => valueToString($user['updated_at'] ?? null),
     ];
 }
 
+// Load the current user record or return a 404 response if it no longer exists.
 function requireCurrentUser(MongoDB\Database $db, string $userId): array|object
 {
     $user = $db->selectCollection('users')->findOne(['user_id' => $userId]);
@@ -88,6 +96,7 @@ function requireCurrentUser(MongoDB\Database $db, string $userId): array|object
     return $user;
 }
 
+// Build a query to find an active post by custom post_id or ObjectId.
 function buildPostQuery(string $postId): array
 {
     $query = [

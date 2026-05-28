@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Read JSON request bodies when present, otherwise support regular form posts.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -18,6 +19,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send a JSON response and stop this API script.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -25,6 +27,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Ensure the endpoint uses the expected HTTP method.
 function requireMethod(string $method): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== $method) {
@@ -35,6 +38,7 @@ function requireMethod(string $method): void
     }
 }
 
+// Require a logged-in user and return their user_id.
 function requireLogin(): string
 {
     if (!isset($_SESSION['user_id'])) {
@@ -47,6 +51,7 @@ function requireLogin(): string
     return (string) $_SESSION['user_id'];
 }
 
+// Read and validate the event_id needed by registration endpoints.
 function getRequiredEventId(array $data): string
 {
     $eventId = trim((string) ($data['event_id'] ?? ''));
@@ -61,6 +66,7 @@ function getRequiredEventId(array $data): string
     return $eventId;
 }
 
+// Build an event lookup query, optionally including soft-deleted events.
 function buildEventQuery(string $eventId, bool $includeDeleted = false): array
 {
     $query = [
@@ -85,6 +91,7 @@ function buildEventQuery(string $eventId, bool $includeDeleted = false): array
     return $query;
 }
 
+// Convert MongoDB date values into API-safe strings.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -98,6 +105,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Convert an event document into the compact event object used in registration lists.
 function eventToSummary(array|object|null $event): ?array
 {
     if ($event === null) {
@@ -117,6 +125,7 @@ function eventToSummary(array|object|null $event): ?array
     ];
 }
 
+// Convert a registration document into the API response shape.
 function registrationToArray(array|object $registration): array
 {
     return [

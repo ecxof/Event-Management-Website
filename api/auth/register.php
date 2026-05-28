@@ -8,6 +8,9 @@ header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
 
+// Registration endpoint: creates a new user account and immediately logs the user in.
+
+// Read JSON registration data from the request body, or fall back to normal form data.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -24,6 +27,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send a JSON response and stop execution.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -40,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $data = readRequestData();
 
+// Normalize all account fields before validation.
 $username = trim((string) ($data['username'] ?? ''));
 $email = strtolower(trim((string) ($data['email'] ?? '')));
 $password = (string) ($data['password'] ?? '');
@@ -75,6 +80,7 @@ if ($telephone !== '' && !ctype_digit($telephone)) {
 }
 
 $users = $db->selectCollection('users');
+// Keep email unique at the database level as well as in application validation.
 $users->createIndex(['email' => 1], ['unique' => true]);
 
 $existingUser = $users->findOne(['email' => $email]);
@@ -89,6 +95,7 @@ if ($existingUser !== null) {
 $userObjectId = new MongoDB\BSON\ObjectId();
 $userId = (string) $userObjectId;
 
+// Store only a password hash, never the raw password.
 $userDocument = [
     '_id' => $userObjectId,
     'user_id' => $userId,
@@ -103,6 +110,7 @@ $userDocument = [
 
 $users->insertOne($userDocument);
 
+// Start an authenticated session for the newly registered user.
 session_regenerate_id(true);
 
 $_SESSION['user_id'] = $userId;

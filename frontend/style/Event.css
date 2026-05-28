@@ -157,6 +157,14 @@
         .btn-footer.btn-full { background-color: var(--primary-color); color: #ffffff; cursor: default; }
         .btn-footer.btn-full:hover { background-color: var(--primary-color); }
 
+        .pagination-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 6px 0 24px; padding: 14px 16px; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); }
+        .pagination-summary { font-size: 13px; font-weight: 700; color: var(--text-light); white-space: nowrap; }
+        .pagination-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+        .pagination-btn { min-width: 38px; height: 36px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 8px; background-color: #ffffff; color: var(--text-main); font-family: var(--font-body); font-size: 13px; font-weight: 800; cursor: pointer; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+        .pagination-btn:hover:not(:disabled), .pagination-btn.is-active { background-color: var(--primary-color); border-color: var(--primary-color); color: #ffffff; }
+        .pagination-btn:disabled { cursor: not-allowed; opacity: 0.45; }
+        .pagination-ellipsis { min-width: 20px; text-align: center; color: var(--text-light); font-weight: 800; }
+
         .form-layout-split { display: flex; gap: 30px; text-align: left; margin-top: 20px; }
         .form-left-uploader { width: 40%; }
         .form-right-inputs { width: 60%; }
@@ -194,4 +202,7 @@
             .event-left-img-box, .detail-big-cover, .form-left-uploader, .form-right-inputs { width: 100%; }
             .event-right-info-box { padding-right: 0; }
             .event-status-badge { position: static; margin-bottom: 10px; }
+            .pagination-bar { align-items: flex-start; flex-direction: column; }
+            .pagination-summary { white-space: normal; }
+            .pagination-actions { justify-content: flex-start; }
         }

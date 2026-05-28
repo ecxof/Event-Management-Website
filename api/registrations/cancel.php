@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Cancel-registration endpoint: marks the logged-in user's active registration as cancelled.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -18,6 +20,7 @@ $eventId = getRequiredEventId($data);
 $events = $db->selectCollection('events');
 $registrations = $db->selectCollection('registrations');
 
+// Include deleted events here so users can still cancel old registrations safely.
 $event = $events->findOne(buildEventQuery($eventId, true));
 $storedEventId = $event !== null ? (string) ($event['event_id'] ?? $event['_id']) : $eventId;
 
@@ -36,6 +39,7 @@ if ($registration === null) {
 
 $now = new MongoDB\BSON\UTCDateTime();
 
+// Soft-cancel the registration instead of deleting it so history remains available.
 $registrations->updateOne(
     [
         'registration_id' => (string) ($registration['registration_id'] ?? $registration['_id']),
@@ -49,6 +53,7 @@ $registrations->updateOne(
     ]
 );
 
+// If a full event loses a participant, reopen it for future registrations.
 if ($event !== null && ($event['status'] ?? '') === 'Full') {
     $events->updateOne(
         ['event_id' => $storedEventId],

@@ -1,7 +1,9 @@
 const API_BASE = '../api';
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560942485-b2a11cc13456?q=80&w=400';
 const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150';
+const DEFAULT_PAGE_LIMIT = 6;
 
+// Shared client-side state used across pages because this project loads one app.js everywhere.
 const state = {
     user: null,
     sessionVerified: false,
@@ -10,8 +12,17 @@ const state = {
     posts: [],
     likedPosts: [],
     myPosts: [],
+    pagination: {
+        events: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        registrations: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        communityPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        postLikedPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        myPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        profileLikedPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+    },
 };
 
+// Send a JSON API request with session cookies and normalize error responses.
 async function apiRequest(path, options = {}) {
     const response = await fetch(`${API_BASE}${path}`, {
         credentials: 'include',
@@ -41,10 +52,42 @@ async function apiRequest(path, options = {}) {
     return data;
 }
 
+// Upload one image file to the PHP upload API and return the Cloudinary image URL.
+async function uploadImage(type, file) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`${API_BASE}/uploads/image.php?type=${encodeURIComponent(type)}`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+    });
+
+    const text = await response.text();
+    let data = {};
+
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch {
+        data = {
+            success: false,
+            message: text || `Upload failed with status ${response.status}`,
+        };
+    }
+
+    if (!response.ok || data.success === false) {
+        throw new Error(data.message || `Upload failed with status ${response.status}`);
+    }
+
+    return data.image_url || '';
+}
+
+// Small DOM helper for finding an element by id.
 function byId(id) {
     return document.getElementById(id);
 }
 
+// Escape user-controlled text before putting it into an HTML string.
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -54,10 +97,12 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+// Display a fallback value when data is missing or empty.
 function fallback(value, fallbackValue = '-') {
     return value === null || value === undefined || value === '' ? fallbackValue : value;
 }
 
+// Programmatically switch the radio-button based page/view state.
 function setChecked(id) {
     const input = byId(id);
     if (input) {
@@ -65,10 +110,12 @@ function setChecked(id) {
     }
 }
 
+// Return the current HTML file name so page-specific initialization can run.
 function currentPage() {
     return window.location.pathname.split('/').pop().toLowerCase();
 }
 
+// Show a form message, or fall back to alert when no message container exists.
 function showMessage(container, message, type = 'info') {
     if (!container) {
         alert(message);
@@ -79,6 +126,7 @@ function showMessage(container, message, type = 'info') {
     container.dataset.type = type;
 }
 
+// Format a date-like value for display while preserving unknown formats.
 function formatDate(value) {
     if (!value) {
         return 'TBA';
@@ -88,6 +136,7 @@ function formatDate(value) {
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString();
 }
 
+// Format a date-time value for display while preserving unknown formats.
 function formatDateTime(value) {
     if (!value) {
         return 'TBA';
@@ -97,6 +146,7 @@ function formatDateTime(value) {
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 }
 
+// Save the current user in memory and localStorage for quick navigation rendering.
 function storeUser(user) {
     state.user = user || null;
 
@@ -105,6 +155,7 @@ function storeUser(user) {
     }
 }
 
+// Read the cached user from localStorage, returning null if the cache is invalid.
 function getStoredUser() {
     try {
         return JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -113,6 +164,31 @@ function getStoredUser() {
     }
 }
 
+// Replace an image only after the target URL loads, reducing avatar flicker.
+function setImageWhenReady(image, src, fallbackSrc = FALLBACK_AVATAR) {
+    if (!src) {
+        image.src = fallbackSrc;
+        return;
+    }
+
+    if (image.src === src) {
+        return;
+    }
+
+    const loader = new Image();
+
+    loader.onload = () => {
+        image.src = src;
+    };
+
+    loader.onerror = () => {
+        image.src = fallbackSrc;
+    };
+
+    loader.src = src;
+}
+
+// Update repeated sidebar profile text and avatar images after loading a user profile.
 function syncProfileText(profile) {
     const user = profile || state.user || getStoredUser();
 
@@ -131,12 +207,18 @@ function syncProfileText(profile) {
             element.textContent = user.anime_interest || 'Anime fan';
         }
     });
+
+    document.querySelectorAll('.avatar-wrapper img, .profile-avatar-wrapper img').forEach((image) => {
+        setImageWhenReady(image, user.avatar_url || '', FALLBACK_AVATAR);
+    });
 }
 
+// Admins land on the event management page after login; regular users land on home.
 function redirectTargetForUser(user) {
     return user?.role === 'admin' ? 'Event.html' : 'HomePage.html';
 }
 
+// Adjust navigation links based on the current user's role.
 function applyRoleNavigation(user = state.user) {
     if (user?.role !== 'admin') {
         return;
@@ -153,6 +235,7 @@ function applyRoleNavigation(user = state.user) {
     byId('label-my-events')?.remove();
 }
 
+// Add the "My Registered Event" menu item for non-admin event pages.
 function ensureUserEventMenu() {
     if (isAdmin() || byId('label-my-events')) {
         return;
@@ -166,6 +249,7 @@ function ensureUserEventMenu() {
     );
 }
 
+// Load the current session user from the API, with optional silent fallback to localStorage.
 async function loadCurrentUser({ silent = true } = {}) {
     try {
         const data = await apiRequest('/profile/me.php');
@@ -189,14 +273,17 @@ async function loadCurrentUser({ silent = true } = {}) {
     }
 }
 
+// Check whether the loaded session belongs to an admin.
 function isAdmin() {
     return state.sessionVerified && state.user?.role === 'admin';
 }
 
+// Render a standard empty-state card for list panels.
 function renderEmpty(message, className = 'feed-item-card') {
     return `<div class="${className}">${escapeHtml(message)}</div>`;
 }
 
+// Render the pixel-style loading placeholder used while API calls are pending.
 function renderLoading(message = 'Connecting to database...') {
     return `
         <div class="loading-card" aria-live="polite">
@@ -215,6 +302,113 @@ function renderLoading(message = 'Connecting to database...') {
     `;
 }
 
+// Convert stored pagination state into a query string for paginated APIs.
+function paginationParams(key) {
+    const current = state.pagination[key] || { page: 1, limit: DEFAULT_PAGE_LIMIT };
+    return `page=${encodeURIComponent(current.page || 1)}&limit=${encodeURIComponent(current.limit || DEFAULT_PAGE_LIMIT)}`;
+}
+
+// Merge pagination metadata from an API response into client-side state.
+function setPagination(key, pagination) {
+    if (!pagination) {
+        return;
+    }
+
+    const existing = state.pagination[key] || { page: 1, limit: DEFAULT_PAGE_LIMIT, total: 0 };
+    const merged = {
+        ...existing,
+        ...pagination,
+    };
+    const limit = Number(merged.limit || DEFAULT_PAGE_LIMIT);
+    const total = Number(merged.total || 0);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const page = Math.min(Number(merged.page || 1), totalPages);
+
+    state.pagination[key] = {
+        ...merged,
+        page,
+        limit,
+        total,
+        total_pages: totalPages,
+        has_previous: page > 1,
+        has_next: total > page * limit,
+    };
+}
+
+// Choose a compact set of page numbers with first/last/current neighbors.
+function pageNumbers(currentPage, totalPages) {
+    const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+
+    return [...pages]
+        .filter((page) => page >= 1 && page <= totalPages)
+        .sort((left, right) => left - right);
+}
+
+// Render Previous/Next and numbered page controls for any paginated list.
+function renderPagination(key, pagination) {
+    if (!pagination || (pagination.total || 0) <= (pagination.limit || DEFAULT_PAGE_LIMIT) || (pagination.total_pages || 1) <= 1) {
+        return '';
+    }
+
+    const currentPage = pagination.page || 1;
+    const totalPages = pagination.total_pages || 1;
+    const pages = pageNumbers(currentPage, totalPages);
+    let lastPage = 0;
+
+    const pageButtons = pages.map((page) => {
+        const gap = page - lastPage > 1 ? '<span class="pagination-ellipsis">...</span>' : '';
+        lastPage = page;
+
+        return `${gap}<button type="button" class="pagination-btn ${page === currentPage ? 'is-active' : ''}" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${page}" ${page === currentPage ? 'aria-current="page"' : ''}>${page}</button>`;
+    }).join('');
+
+    return `
+        <nav class="pagination-bar" aria-label="Pagination">
+            <div class="pagination-summary">Page ${escapeHtml(currentPage)} of ${escapeHtml(totalPages)} - ${escapeHtml(pagination.total || 0)} total</div>
+            <div class="pagination-actions">
+                <button type="button" class="pagination-btn" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${currentPage - 1}" ${pagination.has_previous ? '' : 'disabled'}>Previous</button>
+                ${pageButtons}
+                <button type="button" class="pagination-btn" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${currentPage + 1}" ${pagination.has_next ? '' : 'disabled'}>Next</button>
+            </div>
+        </nav>
+    `;
+}
+
+// Handle clicks on pagination buttons and refresh only the affected panel.
+async function handlePaginationClick(event) {
+    const button = event.target.closest('[data-pagination-key][data-pagination-page]');
+
+    if (!button || button.disabled) {
+        return false;
+    }
+
+    const key = button.dataset.paginationKey;
+    const page = Number(button.dataset.paginationPage);
+
+    if (!Number.isInteger(page) || page < 1) {
+        return true;
+    }
+
+    setPagination(key, { page });
+
+    if (key === 'events') {
+        await renderEvents();
+    } else if (key === 'registrations') {
+        renderMyEvents(await loadMyRegistrations());
+    } else if (key === 'communityPosts') {
+        await renderCommunityPosts();
+    } else if (key === 'postLikedPosts') {
+        await renderLikedPosts();
+    } else if (key === 'myPosts') {
+        await renderMyPosts();
+    } else if (key === 'profileLikedPosts') {
+        await renderProfileLikedPosts();
+    }
+
+    return true;
+}
+
+// Put loading cards into panels before their page-specific data loads.
 function setInitialLoading() {
     const loadingTargets = [
         ['panel-user-list', 'Loading events...'],
@@ -239,6 +433,7 @@ function setInitialLoading() {
     });
 }
 
+// Create or reuse the shared HTML dialog used for details and forms.
 function ensureDialog() {
     let dialog = byId('apiDialog');
 
@@ -253,6 +448,7 @@ function ensureDialog() {
     return dialog;
 }
 
+// Open a read-only dialog with a title and HTML body.
 function openInfoDialog(title, bodyHtml) {
     const dialog = ensureDialog();
     dialog.innerHTML = `
@@ -265,20 +461,39 @@ function openInfoDialog(title, bodyHtml) {
     dialog.showModal();
 }
 
+// Render one dynamic field used by openFormDialog.
+function renderDialogField(field) {
+    if (field.type === 'hidden') {
+        return `<input type="hidden" name="${escapeHtml(field.name)}" value="${escapeHtml(field.value || '')}">`;
+    }
+
+    const label = field.label ? `<span>${escapeHtml(field.label)}</span>` : '';
+    let control = '';
+
+    if (field.type === 'textarea') {
+        control = `<textarea name="${escapeHtml(field.name)}" class="dialog-input" ${field.required ? 'required' : ''}>${escapeHtml(field.value || '')}</textarea>`;
+    } else if (field.type === 'file') {
+        control = `<input type="file" name="${escapeHtml(field.name)}" class="dialog-input" ${field.accept ? `accept="${escapeHtml(field.accept)}"` : ''} ${field.required ? 'required' : ''}>`;
+    } else {
+        control = `<input type="${escapeHtml(field.type || 'text')}" name="${escapeHtml(field.name)}" class="dialog-input" value="${escapeHtml(field.value || '')}" ${field.required ? 'required' : ''}>`;
+    }
+
+    return `
+        <label class="dialog-field">
+            ${label}
+            ${control}
+        </label>
+    `;
+}
+
+// Open a modal form and call onSubmit with its collected fields.
 function openFormDialog({ title, fields, confirmText = 'Submit', pendingText = 'Submitting...', onSubmit }) {
     const dialog = ensureDialog();
     dialog.innerHTML = `
         <form method="dialog" class="api-dialog-form">
             <div class="dialog-title">${escapeHtml(title)}</div>
             <div class="dialog-body">
-                ${fields.map((field) => `
-                    <label class="dialog-field">
-                        <span>${escapeHtml(field.label)}</span>
-                        ${field.type === 'textarea'
-                            ? `<textarea name="${escapeHtml(field.name)}" class="dialog-input" ${field.required ? 'required' : ''}>${escapeHtml(field.value || '')}</textarea>`
-                            : `<input type="${escapeHtml(field.type || 'text')}" name="${escapeHtml(field.name)}" class="dialog-input" value="${escapeHtml(field.value || '')}" ${field.required ? 'required' : ''}>`}
-                    </label>
-                `).join('')}
+                ${fields.map(renderDialogField).join('')}
                 <div class="dialog-inline-message" aria-live="polite"></div>
             </div>
             <div class="dialog-buttons">
@@ -295,7 +510,8 @@ function openFormDialog({ title, fields, confirmText = 'Submit', pendingText = '
         const submitButton = form.querySelector('button[type="submit"]');
         const controls = form.querySelectorAll('button, input, textarea');
         const originalText = submitButton?.textContent || confirmText;
-        const payload = Object.fromEntries(new FormData(form).entries());
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
 
         message.textContent = pendingText;
         controls.forEach((control) => {
@@ -324,12 +540,14 @@ function openFormDialog({ title, fields, confirmText = 'Submit', pendingText = '
     dialog.showModal();
 }
 
+// Close any open dialog when a dialog-close control is clicked.
 document.addEventListener('click', (event) => {
     if (event.target.closest('[data-dialog-close]')) {
         event.target.closest('dialog')?.close();
     }
 });
 
+// Initialize the login page form and redirect after a successful login.
 function initLogin() {
     const form = document.querySelector('form');
     const message = byId('form-message');
@@ -354,6 +572,7 @@ function initLogin() {
     });
 }
 
+// Initialize the register page form and log the new user in after registration.
 function initRegister() {
     const form = document.querySelector('form');
     const message = byId('form-message');
@@ -387,6 +606,7 @@ function initRegister() {
     });
 }
 
+// Initialize the home page by loading the current user's profile text.
 async function initHome() {
     await loadCurrentUser();
 
@@ -395,11 +615,13 @@ async function initHome() {
     }
 }
 
+// Determine whether an event has no available slots.
 function isEventFull(event) {
     const availableSlots = Number(event.available_slots);
     return Number.isFinite(availableSlots) && availableSlots <= 0;
 }
 
+// Render a small text indicator showing event capacity status.
 function slotStatusHtml(event) {
     if (Number.isFinite(Number(event.available_slots))) {
         return `${escapeHtml(event.available_slots)} slots left`;
@@ -408,6 +630,7 @@ function slotStatusHtml(event) {
     return escapeHtml(fallback(event.status, 'Upcoming'));
 }
 
+// Render the joined/full badge shown on event cards.
 function eventStatusBadgeHtml(event, registered) {
     if (registered) {
         return '<span class="event-status-badge joined-status"><i class="fa-solid fa-circle-check"></i> Joined</span>';
@@ -420,6 +643,7 @@ function eventStatusBadgeHtml(event, registered) {
     return '';
 }
 
+// Render one event card for user lists, admin lists, or registered-event lists.
 function eventCard(event, { admin = false, registered = false, canCancel = false } = {}) {
     const image = event.image_url || FALLBACK_IMAGE;
     const statusClass = registered ? 'event-joined-card' : (isEventFull(event) ? 'event-full-card' : '');
@@ -455,6 +679,7 @@ function eventCard(event, { admin = false, registered = false, canCancel = false
     `;
 }
 
+// Initialize the Event page, including admin actions and user registration actions.
 async function initEvents() {
     await loadCurrentUser();
 
@@ -469,6 +694,10 @@ async function initEvents() {
     }
 
     document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
         const detailButton = event.target.closest('[data-event-detail]');
         const editButton = event.target.closest('[data-event-edit]');
         const deleteButton = event.target.closest('[data-event-delete]');
@@ -519,6 +748,7 @@ async function initEvents() {
         }
     });
 
+    // Submit the join-event form for regular users.
     byId('join-event-form')?.addEventListener('submit', async (event) => {
         event.preventDefault();
         const eventId = event.currentTarget.dataset.eventId;
@@ -536,17 +766,37 @@ async function initEvents() {
         }
     });
 
+    // Submit the admin create/update event form, uploading a selected image first.
     byId('admin-event-form')?.addEventListener('submit', async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
-        const payload = Object.fromEntries(new FormData(form).entries());
+        const imageFile = form.elements.image?.files?.[0] || null;
+        const payload = {
+            event_id: form.elements.event_id.value,
+            title: form.elements.title.value,
+            category: form.elements.category.value,
+            description: form.elements.description.value,
+            event_date: form.elements.event_date.value,
+            event_time: form.elements.event_time.value,
+            location: form.elements.location.value,
+            capacity: form.elements.capacity.value,
+            image_url: form.elements.image_url.value || '',
+            status: form.elements.status.value,
+        };
         const endpoint = payload.event_id ? '/admin/events/update.php' : '/admin/events/create.php';
 
         try {
+            if (imageFile) {
+                payload.image_url = await uploadImage('event', imageFile);
+            }
+
             await apiRequest(endpoint, {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
+            if (!payload.event_id) {
+                setPagination('events', { page: 1 });
+            }
             resetEventForm();
             setChecked('tab-admin-list');
             await renderEvents();
@@ -556,6 +806,7 @@ async function initEvents() {
     });
 }
 
+// Refresh the event list and registered-event list after join/cancel/delete changes.
 async function refreshEventViews() {
     if (isAdmin()) {
         await renderEvents();
@@ -567,25 +818,48 @@ async function refreshEventViews() {
     renderMyEvents(registrations);
 }
 
+// Load the current user's paginated active registrations.
 async function loadMyRegistrations() {
-    const data = await apiRequest('/registrations/my_registrations.php');
+    const data = await apiRequest(`/registrations/my_registrations.php?${paginationParams('registrations')}`);
     const registrations = data.registrations || [];
-    state.registeredEventIds = new Set(registrations.map((item) => item.event_id || item.event?.event_id).filter(Boolean));
+    setPagination('registrations', data.pagination);
     return registrations;
 }
 
+// Load registration state for the Event page and keep joined badges accurate.
 async function loadRegistrationState() {
     try {
-        return await loadMyRegistrations();
+        const registrations = await loadMyRegistrations();
+        await loadRegisteredEventIds();
+        return registrations;
     } catch {
         state.registeredEventIds = new Set();
         return [];
     }
 }
 
+// Load every registered event id so event cards can show Joined across all pages.
+async function loadRegisteredEventIds() {
+    const ids = [];
+    let page = 1;
+    let totalPages = 1;
+
+    do {
+        const data = await apiRequest(`/registrations/my_registrations.php?page=${page}&limit=50`);
+        const registrations = data.registrations || [];
+        ids.push(...registrations.map((item) => item.event_id || item.event?.event_id).filter(Boolean));
+        totalPages = data.pagination?.total_pages || 1;
+        page += 1;
+    } while (page <= totalPages);
+
+    state.registeredEventIds = new Set(ids);
+}
+
+// Render the All Events or admin Events Console list.
 async function renderEvents() {
-    const data = await apiRequest('/events/list.php');
+    const data = await apiRequest(`/events/list.php?${paginationParams('events')}`);
     const events = data.events || [];
+    setPagination('events', data.pagination);
     state.events = events;
 
     const userPanel = byId('panel-user-list');
@@ -596,6 +870,7 @@ async function renderEvents() {
             <div class="feed-header-title">Events</div>
             <div class="feed-header-subtitle">Explore upcoming anime activities on campus.</div>
             ${events.length ? events.map((event) => eventCard(event, { registered: state.registeredEventIds.has(event.event_id) })).join('') : renderEmpty('No events found.', 'event-item-card')}
+            ${renderPagination('events', state.pagination.events)}
         `;
     }
 
@@ -611,10 +886,12 @@ async function renderEvents() {
             ${isAdmin()
                 ? (events.length ? events.map((event) => eventCard(event, { admin: true })).join('') : renderEmpty('No events found.', 'event-item-card'))
                 : renderEmpty('Admin access required.', 'event-item-card')}
+            ${isAdmin() ? renderPagination('events', state.pagination.events) : ''}
         `;
     }
 }
 
+// Render the current user's registered events list.
 function renderMyEvents(registrations = []) {
     const panel = byId('panel-my-events');
 
@@ -628,9 +905,11 @@ function renderMyEvents(registrations = []) {
         ${registrations.length
             ? registrations.map((item) => eventCard({ ...item.event, status: item.status }, { registered: true, canCancel: true })).join('')
             : renderEmpty('You have not joined any events yet.', 'event-item-card')}
+        ${renderPagination('registrations', state.pagination.registrations)}
     `;
 }
 
+// Render the event detail panel for either user view or admin view.
 async function renderEventDetail(eventId, admin = false) {
     const endpoint = admin
         ? `/admin/events/detail.php?event_id=${encodeURIComponent(eventId)}`
@@ -675,6 +954,7 @@ async function renderEventDetail(eventId, admin = false) {
     setChecked(admin ? 'tab-admin-detail' : 'tab-event-detail');
 }
 
+// Render the join button state for an event detail view.
 function renderJoinControl(event) {
     if (event.is_joined) {
         return '<span class="btn-footer btn-joined"><i class="fa-solid fa-circle-check"></i> Joined</span>';
@@ -687,6 +967,7 @@ function renderJoinControl(event) {
     return '<label class="btn-footer btn-confirm" for="tab-join-form">Join Event</label>';
 }
 
+// Render the admin participant list inside an event detail view.
 function renderParticipants(participants) {
     return `
         <div class="participants-box">
@@ -700,6 +981,7 @@ function renderParticipants(participants) {
     `;
 }
 
+// Reset the admin event form to create mode.
 function resetEventForm() {
     const form = byId('admin-event-form');
     form?.reset();
@@ -708,11 +990,20 @@ function resetEventForm() {
         form.elements.event_id.value = '';
     }
 
+    if (form?.elements.image_url) {
+        form.elements.image_url.value = '';
+    }
+
+    if (form?.elements.image) {
+        form.elements.image.value = '';
+    }
+
     if (byId('admin-form-title')) {
         byId('admin-form-title').textContent = 'Plan Your Event';
     }
 }
 
+// Load an event into the admin form for editing.
 async function fillEventForm(eventId) {
     const data = await apiRequest(`/admin/events/detail.php?event_id=${encodeURIComponent(eventId)}`);
     const event = data.event;
@@ -728,24 +1019,39 @@ async function fillEventForm(eventId) {
     form.elements.location.value = event.location || '';
     form.elements.capacity.value = event.capacity || '';
     form.elements.image_url.value = event.image_url || '';
+    if (form.elements.image) {
+        form.elements.image.value = '';
+    }
     form.elements.status.value = event.status || 'Upcoming';
     setChecked('tab-admin-form');
 }
 
+// Initialize the Post page, including create-post form and action buttons.
 async function initPosts() {
     await loadCurrentUser();
     await Promise.allSettled([renderCommunityPosts(), renderLikedPosts()]);
 
+    // Create a new post, uploading the selected image to Cloudinary first when present.
     byId('new-post-form')?.addEventListener('submit', async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
-        const payload = Object.fromEntries(new FormData(form).entries());
+        const imageFile = form.elements.image?.files?.[0] || null;
+        const payload = {
+            title: form.elements.title.value,
+            content: form.elements.content.value,
+            image_url: form.elements.image_url.value || '',
+        };
 
         try {
+            if (imageFile) {
+                payload.image_url = await uploadImage('post', imageFile);
+            }
+
             await apiRequest('/posts/create.php', {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
+            setPagination('communityPosts', { page: 1 });
             form.reset();
             setChecked('tab-community');
             await Promise.allSettled([renderCommunityPosts(), renderLikedPosts()]);
@@ -754,9 +1060,16 @@ async function initPosts() {
         }
     });
 
-    document.body.addEventListener('click', handlePostActionClick);
+    document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
+        await handlePostActionClick(event);
+    });
 }
 
+// Route clicks for post like/comment/share/detail/edit/delete/profile actions.
 async function handlePostActionClick(event) {
     const likeButton = event.target.closest('[data-like-post]');
     const commentButton = event.target.closest('[data-comment-post]');
@@ -787,6 +1100,7 @@ async function handlePostActionClick(event) {
     }
 }
 
+// Refresh post-related panels depending on the current page.
 async function refreshPostViews() {
     const page = currentPage();
 
@@ -797,6 +1111,7 @@ async function refreshPostViews() {
     }
 }
 
+// Like or unlike a post, then refresh the visible post lists.
 async function togglePostLike(postId, isLikedNow) {
     await apiRequest(isLikedNow ? '/posts/unlike.php' : '/posts/like.php', {
         method: 'POST',
@@ -805,6 +1120,7 @@ async function togglePostLike(postId, isLikedNow) {
     await refreshPostViews();
 }
 
+// Open the comment form dialog for a selected post.
 function openCommentDialog(postId) {
     openFormDialog({
         title: 'Add Comment',
@@ -831,6 +1147,7 @@ function openCommentDialog(postId) {
     });
 }
 
+// After adding a comment, return users to the Post page community feed.
 async function returnToPostPageAfterComment() {
     if (currentPage() !== 'post.html') {
         window.location.href = 'Post.html';
@@ -841,6 +1158,7 @@ async function returnToPostPageAfterComment() {
     setChecked('tab-community');
 }
 
+// Record a share action for a post and refresh counters.
 async function sharePost(postId) {
     await apiRequest('/posts/share.php', {
         method: 'POST',
@@ -850,6 +1168,7 @@ async function sharePost(postId) {
     alert('Post shared successfully.');
 }
 
+// Show the full post detail, either in a dialog or Profile page detail panel.
 async function showPostDetail(postId, backTarget = null) {
     const data = await apiRequest(`/posts/detail.php?post_id=${encodeURIComponent(postId)}`);
     const post = data.post;
@@ -873,6 +1192,7 @@ async function showPostDetail(postId, backTarget = null) {
     openInfoDialog('Post Information', postDetailHtml(post, comments, image));
 }
 
+// Build the reusable post detail HTML including image, metadata, and comments.
 function postDetailHtml(post, comments, image) {
     return `
         <div class="post-detail-hero-flex">
@@ -900,6 +1220,7 @@ function postDetailHtml(post, comments, image) {
     `;
 }
 
+// Open the edit-post dialog and upload a replacement image if one is selected.
 function openEditPostDialog(postId) {
     const post = state.myPosts.find((item) => item.post_id === postId) || state.posts.find((item) => item.post_id === postId);
 
@@ -914,9 +1235,16 @@ function openEditPostDialog(postId) {
         fields: [
             { name: 'title', label: 'Title', value: post.title || '', required: true },
             { name: 'content', label: 'Content', type: 'textarea', value: post.content || '', required: true },
-            { name: 'image_url', label: 'Image URL', type: 'url', value: post.image_url || '' },
+            { name: 'image', label: 'Post Image', type: 'file', accept: 'image/*' },
+            { name: 'image_url', type: 'hidden', value: post.image_url || '' },
         ],
         onSubmit: async (payload) => {
+            if (payload.image instanceof File && payload.image.size > 0) {
+                payload.image_url = await uploadImage('post', payload.image);
+            }
+
+            delete payload.image;
+
             await apiRequest('/posts/update.php', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -929,6 +1257,7 @@ function openEditPostDialog(postId) {
     });
 }
 
+// Soft-delete a post through the API and refresh visible lists.
 async function deletePost(postId) {
     await apiRequest('/posts/delete.php', {
         method: 'POST',
@@ -937,21 +1266,28 @@ async function deletePost(postId) {
     await refreshPostViews();
 }
 
+// Show another user's public profile and their active posts.
 async function showPublicProfile(userId) {
     const data = await apiRequest(`/profile/view.php?user_id=${encodeURIComponent(userId)}`);
     const profile = data.profile;
     const posts = data.posts || [];
+    const avatar = profile.avatar_url || FALLBACK_AVATAR;
 
     openInfoDialog('Profile', `
-        <div class="info-display-group">
-            <div class="info-display-label">Username</div>
-            <div class="info-display-value">${escapeHtml(profile.username || 'User')}</div>
+        <div class="public-profile-header">
+            <img class="public-profile-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(profile.username || 'User')}">
         </div>
-        <div class="info-display-group">
-            <div class="info-display-label">Anime Interest</div>
-            <div class="info-display-value bio-text">${escapeHtml(profile.anime_interest || 'No anime interest added yet.')}</div>
+        <div class="public-profile-fields">
+            <div class="public-profile-field">
+                <span>Username</span>
+                <strong>${escapeHtml(profile.username || 'User')}</strong>
+            </div>
+            <div class="public-profile-field">
+                <span>Anime Interest</span>
+                <strong>${escapeHtml(profile.anime_interest || 'No anime interest added yet.')}</strong>
+            </div>
         </div>
-        <div class="feed-header-subtitle">Posts (${posts.length})</div>
+        <div class="public-profile-post-count">Posts (${posts.length})</div>
         ${posts.length ? posts.map((post) => `
             <div class="comment-row">
                 <strong>${escapeHtml(post.title || 'Untitled Post')}</strong>
@@ -961,40 +1297,47 @@ async function showPublicProfile(userId) {
     `);
 }
 
+// Render paginated community posts on the Post page.
 async function renderCommunityPosts() {
     const panel = byId('panel-community');
 
     try {
-        const data = await apiRequest('/posts/list.php');
+        const data = await apiRequest(`/posts/list.php?${paginationParams('communityPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('communityPosts', data.pagination);
         state.posts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">Community Square</div>
             <div class="feed-header-subtitle">See what's happening around the exhibition.</div>
             ${posts.length ? posts.map((post) => renderPostCard(post, { showCommentPreview: true })).join('') : renderEmpty('No posts found.')}
+            ${renderPagination('communityPosts', state.pagination.communityPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
     }
 }
 
+// Render paginated posts liked by the current user on the Post page.
 async function renderLikedPosts() {
     const panel = byId('panel-liked-posts-flow');
 
     try {
-        const data = await apiRequest('/profile/liked_posts.php');
+        const data = await apiRequest(`/profile/liked_posts.php?${paginationParams('postLikedPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('postLikedPosts', data.pagination);
         state.likedPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Like Post</div>
             <div class="feed-header-subtitle">Liked posts (${posts.length})</div>
             ${posts.length ? posts.map((post) => renderPostCard(post, { showCommentPreview: true })).join('') : renderEmpty('You have not liked any posts yet.')}
+            ${renderPagination('postLikedPosts', state.pagination.postLikedPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
     }
 }
 
+// Render the two most recent comments shown under each post card.
 function previewCommentsHtml(comments = []) {
     const preview = comments.slice(0, 2);
 
@@ -1011,6 +1354,7 @@ function previewCommentsHtml(comments = []) {
     `;
 }
 
+// Fetch comment previews for the posts currently visible on a page.
 async function withCommentPreview(posts) {
     return Promise.all(posts.map(async (post) => {
         try {
@@ -1032,6 +1376,7 @@ async function withCommentPreview(posts) {
     }));
 }
 
+// Render one post card with optional owner controls and comment preview.
 function renderPostCard(post, { ownerTools = false, profileDetailTarget = null, showCommentPreview = false } = {}) {
     const image = post.image_url || FALLBACK_IMAGE;
     const liked = post.is_liked ? 'true' : 'false';
@@ -1069,6 +1414,7 @@ function renderPostCard(post, { ownerTools = false, profileDetailTarget = null, 
     `;
 }
 
+// Initialize the Profile page, including profile edit and profile post lists.
 async function initProfile() {
     const profile = await loadCurrentUser({ silent: false }).catch((error) => {
         byId('panel-view-mode').innerHTML = renderEmpty(error.message);
@@ -1081,11 +1427,24 @@ async function initProfile() {
 
     await Promise.allSettled([renderMyPosts(), renderProfileLikedPosts()]);
 
+    // Save profile changes, uploading a new avatar first when the user selected one.
     byId('profile-edit-form')?.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+        const form = event.currentTarget;
+        const avatarFile = form.elements.avatar?.files?.[0] || null;
+        const payload = {
+            username: form.elements.username.value,
+            anime_interest: form.elements.anime_interest.value,
+            email: form.elements.email.value,
+            telephone: form.elements.telephone.value,
+            avatar_url: form.elements.avatar_url.value || '',
+        };
 
         try {
+            if (avatarFile) {
+                payload.avatar_url = await uploadImage('avatar', avatarFile);
+            }
+
             const data = await apiRequest('/profile/update.php', {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -1111,6 +1470,10 @@ async function initProfile() {
     });
 
     document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
         const detailButton = event.target.closest('[data-profile-detail-target]');
 
         if (detailButton) {
@@ -1127,6 +1490,7 @@ async function initProfile() {
     });
 }
 
+// Render the main profile details panel and keep the edit form in sync.
 function renderProfile(profile) {
     const bio = profile.anime_interest || 'No anime interest added yet.';
     const panel = byId('panel-view-mode');
@@ -1163,43 +1527,55 @@ function renderProfile(profile) {
         form.elements.anime_interest.value = profile.anime_interest || '';
         form.elements.email.value = profile.email || '';
         form.elements.telephone.value = profile.telephone || '';
+        form.elements.avatar_url.value = profile.avatar_url || '';
+
+        if (form.elements.avatar) {
+            form.elements.avatar.value = '';
+        }
     }
 }
 
+// Render paginated posts created by the current user.
 async function renderMyPosts() {
     const panel = byId('panel-sent-posts');
 
     try {
-        const data = await apiRequest('/profile/my_posts.php');
+        const data = await apiRequest(`/profile/my_posts.php?${paginationParams('myPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('myPosts', data.pagination);
         state.myPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Sent Post</div>
             <div class="feed-header-subtitle">Review all posts you have shared with the exhibition community.</div>
             <div class="scrollable-feed-list">${posts.length ? posts.map((post) => renderPostCard(post, { ownerTools: true, profileDetailTarget: 'sent', showCommentPreview: true })).join('') : renderEmpty('You have not published any posts yet.')}</div>
+            ${renderPagination('myPosts', state.pagination.myPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
     }
 }
 
+// Render paginated posts liked by the current user on the Profile page.
 async function renderProfileLikedPosts() {
     const panel = byId('panel-like-posts');
 
     try {
-        const data = await apiRequest('/profile/liked_posts.php');
+        const data = await apiRequest(`/profile/liked_posts.php?${paginationParams('profileLikedPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('profileLikedPosts', data.pagination);
         state.likedPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Like Post</div>
             <div class="feed-header-subtitle">Review all creative gallery updates you have liked.</div>
             <div class="scrollable-feed-list">${posts.length ? posts.map((post) => renderPostCard(post, { profileDetailTarget: 'liked', showCommentPreview: true })).join('') : renderEmpty('You have not liked any posts yet.')}</div>
+            ${renderPagination('profileLikedPosts', state.pagination.profileLikedPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
     }
 }
 
+// Entry point: detect the current HTML page and initialize only the needed features.
 document.addEventListener('DOMContentLoaded', () => {
     setInitialLoading();
     applyRoleNavigation(getStoredUser());

@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Admin delete-event endpoint: soft-deletes an event so it disappears from normal lists.
+
 requireMethod('POST');
 requireAdmin();
 
@@ -16,6 +18,8 @@ $data = readRequestData();
 $eventId = getRequiredString($data, 'event_id');
 
 $events = $db->selectCollection('events');
+
+// Soft deletion keeps the event record and audit data instead of removing it permanently.
 $result = $events->updateOne(
     buildEventQuery($eventId),
     [

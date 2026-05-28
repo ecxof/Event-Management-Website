@@ -7,7 +7,11 @@ session_start();
 header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
+require __DIR__ . '/../pagination.php';
 
+// Event-list endpoint: returns paginated visible events with joined counts.
+
+// Send a JSON response and stop this API script.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -15,6 +19,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Convert MongoDB date values into frontend-safe strings.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -28,6 +33,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Convert an event document into the compact card object used by list views.
 function eventToListItem(array|object $event, int $joinedCount): array
 {
     $capacity = isset($event['capacity']) ? (int) $event['capacity'] : 0;
@@ -56,27 +62,37 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 $events = $db->selectCollection('events');
 $registrations = $db->selectCollection('registrations');
+$pagination = readPaginationParams();
 
-$cursor = $events->find(
-    [
-        'status' => [
-            '$nin' => ['Deleted', 'deleted', 'DELETED'],
-        ],
-        'deleted_at' => [
-            '$exists' => false,
-        ],
+// Hide soft-deleted events from user and admin list pages.
+$query = [
+    'status' => [
+        '$nin' => ['Deleted', 'deleted', 'DELETED'],
     ],
+    'deleted_at' => [
+        '$exists' => false,
+    ],
+];
+$total = $events->countDocuments($query);
+$pagination = clampPagination($pagination, $total);
+
+// Events are ordered by upcoming date/time, with newer created records used as a tie breaker.
+$cursor = $events->find(
+    $query,
     [
         'sort' => [
             'event_date' => 1,
             'event_time' => 1,
             'created_at' => -1,
         ],
+        'skip' => $pagination['skip'],
+        'limit' => $pagination['limit'],
     ]
 );
 
 $eventList = [];
 
+// Count joined registrations per event so the UI can show slots and full status.
 foreach ($cursor as $event) {
     $eventId = (string) ($event['event_id'] ?? $event['_id']);
     $joinedCount = $registrations->countDocuments([
@@ -90,4 +106,5 @@ foreach ($cursor as $event) {
 respond(200, [
     'success' => true,
     'events' => $eventList,
+    'pagination' => paginationMeta($pagination['page'], $pagination['limit'], $total),
 ]);
