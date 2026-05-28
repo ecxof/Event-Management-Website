@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/../posts/helpers.php';
 
+// Public-profile endpoint: returns another user's public profile and active posts.
+
 requireMethod('GET');
 requireLogin();
 
@@ -32,6 +34,7 @@ if ($user === null) {
     ]);
 }
 
+// Public profile view shows the selected user's active posts newest first.
 $cursor = $posts->find(
     [
         'user_id' => $userId,
@@ -47,6 +50,7 @@ $cursor = $posts->find(
 $postList = [];
 $currentUserId = (string) $_SESSION['user_id'];
 
+// The current user id is passed in so each post can include is_liked for the viewer.
 foreach ($cursor as $post) {
     $postList[] = postToArray($db, $post, $currentUserId);
 }
@@ -58,6 +62,7 @@ respond(200, [
         'username' => (string) ($user['username'] ?? ''),
         'role' => (string) ($user['role'] ?? 'user'),
         'anime_interest' => $user['anime_interest'] ?? '',
+        'avatar_url' => (string) ($user['avatar_url'] ?? ''),
         'created_at' => valueToString($user['created_at'] ?? null),
     ],
     'posts' => $postList,

@@ -8,6 +8,9 @@ header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
 
+// Login endpoint: verifies email/password and stores the authenticated user in the PHP session.
+
+// Read JSON login data from the request body, or fall back to normal form data.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -24,6 +27,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send a JSON response and stop execution.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -40,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $data = readRequestData();
 
+// Normalize login credentials before checking them against MongoDB.
 $email = strtolower(trim((string) ($data['email'] ?? '')));
 $password = (string) ($data['password'] ?? '');
 
@@ -53,6 +58,7 @@ if ($email === '' || $password === '') {
 $users = $db->selectCollection('users');
 $user = $users->findOne(['email' => $email]);
 
+// Password hashes are verified server-side; the stored password is never returned.
 if ($user === null || !isset($user['password']) || !password_verify($password, (string) $user['password'])) {
     respond(401, [
         'success' => false,
@@ -60,6 +66,7 @@ if ($user === null || !isset($user['password']) || !password_verify($password, (
     ]);
 }
 
+// Regenerate the session id after login to reduce session fixation risk.
 session_regenerate_id(true);
 
 $_SESSION['user_id'] = (string) $user['user_id'];

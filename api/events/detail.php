@@ -8,6 +8,9 @@ header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
 
+// Event-detail endpoint: returns one visible event with capacity and current join state.
+
+// Send a JSON response and stop this API script.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -15,6 +18,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Convert MongoDB date values into frontend-safe strings.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -28,6 +32,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Find an event by event_id or ObjectId while excluding deleted events.
 function buildEventQuery(string $eventId): array
 {
     $query = [
@@ -49,6 +54,7 @@ function buildEventQuery(string $eventId): array
     return $query;
 }
 
+// Convert an event document into the detail object used by the event detail view.
 function eventToDetail(array|object $event, int $joinedCount, bool $isJoined): array
 {
     $capacity = isset($event['capacity']) ? (int) $event['capacity'] : 0;
@@ -102,6 +108,7 @@ if ($event === null) {
 
 $storedEventId = (string) ($event['event_id'] ?? $event['_id']);
 
+// Count active registrations to show available capacity.
 $joinedCount = $registrations->countDocuments([
     'event_id' => $storedEventId,
     'status' => 'joined',
@@ -109,6 +116,7 @@ $joinedCount = $registrations->countDocuments([
 
 $isJoined = false;
 
+// Logged-in users see whether they have already joined this event.
 if (isset($_SESSION['user_id'])) {
     $isJoined = $registrations->countDocuments([
         'event_id' => $storedEventId,

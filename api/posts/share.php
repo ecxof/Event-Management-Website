@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Share endpoint: records one share action for analytics/counting.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -19,6 +21,7 @@ $post = requirePost($db, $postId);
 $storedPostId = (string) ($post['post_id'] ?? $post['_id']);
 $shareObjectId = new MongoDB\BSON\ObjectId();
 
+// Each share click is stored as a separate document so share_count can be calculated.
 $shareDocument = [
     '_id' => $shareObjectId,
     'share_id' => (string) $shareObjectId,

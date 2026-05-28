@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Post-detail endpoint: returns one post and its active comments.
+
 requireMethod('GET');
 
 $postId = trim((string) ($_GET['post_id'] ?? ''));
@@ -24,6 +26,7 @@ $post = requirePost($db, $postId);
 $currentUserId = isset($_SESSION['user_id']) ? (string) $_SESSION['user_id'] : null;
 $comments = $db->selectCollection('postComments');
 
+// Comments are sorted oldest first for a natural conversation order.
 $commentCursor = $comments->find(
     [
         'post_id' => (string) ($post['post_id'] ?? $post['_id']),

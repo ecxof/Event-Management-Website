@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Update-post endpoint: lets the post owner or an admin edit title, content, or image URL.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -20,6 +22,7 @@ requirePostOwnerOrAdmin($post, $userId);
 
 $updates = [];
 
+// image_url is optional because users may keep, replace, or remove the post image.
 foreach (['title', 'content', 'image_url'] as $field) {
     if (!array_key_exists($field, $data)) {
         continue;
@@ -44,6 +47,7 @@ if ($updates === []) {
     ]);
 }
 
+// updated_at lets the UI or future audits know when the content last changed.
 $updates['updated_at'] = new MongoDB\BSON\UTCDateTime();
 $posts = $db->selectCollection('posts');
 

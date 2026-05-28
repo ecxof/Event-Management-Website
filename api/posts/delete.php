@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Delete-post endpoint: soft-deletes a post owned by the user or managed by an admin.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -18,6 +20,7 @@ $postId = getRequiredString($data, 'post_id');
 $post = requirePost($db, $postId);
 requirePostOwnerOrAdmin($post, $userId);
 
+// Soft delete keeps the record for history while hiding it from normal queries.
 $db->selectCollection('posts')->updateOne(
     buildPostQuery($postId),
     [

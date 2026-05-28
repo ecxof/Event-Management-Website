@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Like-post endpoint: records a user's like for a post.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -24,6 +26,7 @@ $existingLike = $likes->findOne([
     'user_id' => $userId,
 ]);
 
+// Likes are idempotent: liking an already-liked post does not create duplicates.
 if ($existingLike === null) {
     $likeObjectId = new MongoDB\BSON\ObjectId();
 

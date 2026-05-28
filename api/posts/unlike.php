@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Unlike-post endpoint: removes the current user's like from a post.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -18,6 +20,7 @@ $postId = getRequiredString($data, 'post_id');
 $post = requirePost($db, $postId);
 $storedPostId = (string) ($post['post_id'] ?? $post['_id']);
 
+// Deleting a missing like is still a successful no-op for the frontend.
 $db->selectCollection('postLikes')->deleteOne([
     'post_id' => $storedPostId,
     'user_id' => $userId,

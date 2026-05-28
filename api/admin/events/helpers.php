@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Read JSON request bodies when present, otherwise support regular form posts.
 function readRequestData(): array
 {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -18,6 +19,7 @@ function readRequestData(): array
     return $_POST;
 }
 
+// Send a JSON response and stop execution immediately.
 function respond(int $statusCode, array $payload): void
 {
     http_response_code($statusCode);
@@ -25,6 +27,7 @@ function respond(int $statusCode, array $payload): void
     exit;
 }
 
+// Require the current session to be logged in as an administrator.
 function requireAdmin(): void
 {
     if (!isset($_SESSION['user_id'])) {
@@ -42,6 +45,7 @@ function requireAdmin(): void
     }
 }
 
+// Enforce the HTTP method used by an admin endpoint.
 function requireMethod(string $method): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== $method) {
@@ -52,6 +56,7 @@ function requireMethod(string $method): void
     }
 }
 
+// Read a required non-empty string field from request data.
 function getRequiredString(array $data, string $field): string
 {
     $value = trim((string) ($data[$field] ?? ''));
@@ -66,11 +71,13 @@ function getRequiredString(array $data, string $field): string
     return $value;
 }
 
+// Read an optional string field and trim surrounding whitespace.
 function getOptionalString(array $data, string $field): string
 {
     return trim((string) ($data[$field] ?? ''));
 }
 
+// Validate the event capacity field and return it as an integer.
 function getCapacity(array $data, bool $required): ?int
 {
     if (!isset($data['capacity']) || trim((string) $data['capacity']) === '') {
@@ -96,6 +103,7 @@ function getCapacity(array $data, bool $required): ?int
     return $capacity;
 }
 
+// Validate event status against the allowed admin-managed status list.
 function getStatus(array $data, bool $required): ?string
 {
     $status = trim((string) ($data['status'] ?? ''));
@@ -123,6 +131,7 @@ function getStatus(array $data, bool $required): ?string
     return $status;
 }
 
+// Build a lookup query that accepts either event_id or MongoDB ObjectId.
 function buildEventQuery(string $eventId): array
 {
     $query = [
@@ -138,6 +147,7 @@ function buildEventQuery(string $eventId): array
     return $query;
 }
 
+// Convert MongoDB date values to API-safe strings.
 function valueToString(mixed $value): ?string
 {
     if ($value === null) {
@@ -151,6 +161,7 @@ function valueToString(mixed $value): ?string
     return (string) $value;
 }
 
+// Convert a full event document into the admin API response shape.
 function eventToArray(array|object $event): array
 {
     return [

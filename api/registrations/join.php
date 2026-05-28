@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Join-event endpoint: creates or reactivates a registration for the logged-in user.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -31,6 +33,7 @@ $storedEventId = (string) ($event['event_id'] ?? $event['_id']);
 $eventStatus = (string) ($event['status'] ?? 'Upcoming');
 $capacity = isset($event['capacity']) ? (int) $event['capacity'] : 0;
 
+// Only Upcoming events are open for joining.
 if ($eventStatus !== 'Upcoming') {
     respond(409, [
         'success' => false,
@@ -38,11 +41,13 @@ if ($eventStatus !== 'Upcoming') {
     ]);
 }
 
+// Count joined users before inserting so capacity cannot be exceeded.
 $joinedCount = $registrations->countDocuments([
     'event_id' => $storedEventId,
     'status' => 'joined',
 ]);
 
+// If capacity is already full, mark the event as Full and reject the registration.
 if ($capacity > 0 && $joinedCount >= $capacity) {
     $events->updateOne(
         ['event_id' => $storedEventId],
@@ -60,6 +65,7 @@ if ($capacity > 0 && $joinedCount >= $capacity) {
     ]);
 }
 
+// Prevent duplicate active registrations for the same user and event.
 $existingRegistration = $registrations->findOne([
     'user_id' => $userId,
     'event_id' => $storedEventId,
@@ -74,6 +80,7 @@ if ($existingRegistration !== null && ($existingRegistration['status'] ?? '') ==
 
 $now = new MongoDB\BSON\UTCDateTime();
 
+// A cancelled registration can be reactivated instead of creating a duplicate document.
 if ($existingRegistration !== null) {
     $registrations->updateOne(
         [
@@ -95,6 +102,7 @@ if ($existingRegistration !== null) {
         'registration_id' => (string) ($existingRegistration['registration_id'] ?? $existingRegistration['_id']),
     ]);
 } else {
+    // First-time join creates a new registration document.
     $registrationObjectId = new MongoDB\BSON\ObjectId();
     $registrationId = (string) $registrationObjectId;
 
@@ -110,6 +118,7 @@ if ($existingRegistration !== null) {
     $registrations->insertOne($registration);
 }
 
+// After joining, update the event status if the new registration filled the last slot.
 $newJoinedCount = $registrations->countDocuments([
     'event_id' => $storedEventId,
     'status' => 'joined',

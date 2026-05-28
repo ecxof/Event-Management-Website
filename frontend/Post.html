@@ -59,7 +59,8 @@
                                 <div class="form-group"><input type="text" name="title" class="form-control" placeholder="Post title" required></div>
                                 <div class="form-group"><textarea name="content" class="form-control" placeholder="Write something here... What's on your mind?" required></textarea></div>
                                 <div class="form-group">
-                                    <input type="url" name="image_url" class="form-control" placeholder="Image URL (optional)">
+                                    <input type="file" name="image" class="form-control" accept="image/*">
+                                    <input type="hidden" name="image_url">
                                 </div>
                                 <button type="submit" class="btn-submit-post">Publish</button>
                             </form>

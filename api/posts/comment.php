@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../connect_db/db.php';
 require __DIR__ . '/helpers.php';
 
+// Comment endpoint: adds a new active comment to a post.
+
 requireMethod('POST');
 
 $userId = requireLogin();
@@ -21,6 +23,7 @@ $storedPostId = (string) ($post['post_id'] ?? $post['_id']);
 $commentObjectId = new MongoDB\BSON\ObjectId();
 $now = new MongoDB\BSON\UTCDateTime();
 
+// Comments keep their own status so they can be hidden later without deleting the document.
 $commentDocument = [
     '_id' => $commentObjectId,
     'comment_id' => (string) $commentObjectId,

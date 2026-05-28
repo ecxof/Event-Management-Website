@@ -6,6 +6,8 @@ session_start();
 
 header('Content-Type: application/json');
 
+// Logout endpoint: clears the session and removes the session cookie.
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
@@ -17,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $_SESSION = [];
 
+// Delete the browser session cookie when PHP sessions are cookie-based.
 if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
     setcookie(
@@ -30,6 +33,7 @@ if (ini_get('session.use_cookies')) {
     );
 }
 
+// Destroy the server-side session data.
 session_destroy();
 
 echo json_encode([

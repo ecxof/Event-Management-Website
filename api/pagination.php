@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Read page and limit from the query string while enforcing sensible defaults and max limit.
 function readPaginationParams(int $defaultLimit = 6, int $maxLimit = 50): array
 {
     $page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
@@ -18,6 +19,7 @@ function readPaginationParams(int $defaultLimit = 6, int $maxLimit = 50): array
     ];
 }
 
+// Build the pagination metadata object returned by list endpoints.
 function paginationMeta(int $page, int $limit, int $total): array
 {
     $totalPages = max(1, (int) ceil($total / $limit));
@@ -33,6 +35,7 @@ function paginationMeta(int $page, int $limit, int $total): array
     ];
 }
 
+// Clamp a requested page to the actual available page range before querying data.
 function clampPagination(array $pagination, int $total): array
 {
     $totalPages = max(1, (int) ceil($total / $pagination['limit']));
