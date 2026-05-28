@@ -144,9 +144,34 @@ php composer.phar install
 composer install
 ```
 
+The required PHP packages include:
+
+```json
+{
+    "mongodb/mongodb": "^2.3",
+    "cloudinary/cloudinary_php": "^3.1"
+}
+```
+
+If the Cloudinary package is missing in your local `composer.json`, install it through Composer:
+
+#### macOS / project Composer
+
+```bash
+php composer.phar require cloudinary/cloudinary_php
+```
+
+#### Windows / global Composer
+
+```bat
+composer require cloudinary/cloudinary_php
+```
+
+After installing or changing Composer packages, make sure the `vendor/` folder exists because the PHP APIs load dependencies through `vendor/autoload.php`.
+
 ### 4. Create connect_db/config.php
 
-`connect_db/config.php` is ignored by Git because it contains the MongoDB connection string. Each developer needs to create this file locally.
+`connect_db/config.php` is ignored by Git because it contains the MongoDB connection string and Cloudinary credentials. Each developer needs to create this file locally.
 
 Create this file:
 
@@ -162,10 +187,79 @@ Then add this code:
 return [
     'mongodb_uri' => 'mongodb+srv://username:password@cluster.mongodb.net/',
     'database' => 'event_management',
+
+    'cloudinary' => [
+        'cloud_name' => 'your_cloud_name',
+        'api_key' => 'your_api_key',
+        'api_secret' => 'your_api_secret',
+    ],
 ];
 ```
 
 Replace `mongodb_uri` with the connection string copied from MongoDB Atlas. If the password contains special characters such as `@`, `#`, `/`, `:`, `?`, `&`, or `%`, encode the password before using it in the URI.
+
+Replace the Cloudinary values with the credentials from your Cloudinary dashboard:
+
+- `cloud_name`: your Cloudinary cloud name
+- `api_key`: your Cloudinary API key
+- `api_secret`: your Cloudinary API secret
+
+Do not commit real Cloudinary credentials to Git.
+
+## Using Cloudinary Uploads
+
+The project uploads images through this backend endpoint:
+
+```text
+api/uploads/image.php
+```
+
+The endpoint reads Cloudinary credentials from `connect_db/config.php`, uploads the image to Cloudinary, and returns the permanent HTTPS image URL. The frontend can then save that returned URL in MongoDB.
+
+Send a `POST` request using `multipart/form-data`:
+
+```text
+api/uploads/image.php?type=post
+```
+
+The image file must be sent in the field named:
+
+```text
+image
+```
+
+Supported upload types:
+
+| Type | Cloudinary folder |
+| --- | --- |
+| `avatar` | `event-management/avatars` |
+| `event` | `event-management/events` |
+| `post` | `event-management/posts` |
+
+Supported image formats:
+
+- JPG
+- PNG
+- WEBP
+- GIF
+
+Maximum file size:
+
+```text
+5MB
+```
+
+Successful upload response example:
+
+```json
+{
+    "success": true,
+    "image_url": "https://res.cloudinary.com/your_cloud_name/image/upload/...",
+    "public_id": "event-management/posts/..."
+}
+```
+
+Use `image_url` as the value to store in MongoDB for avatars, events, or posts.
 
 ## References
 
@@ -173,4 +267,5 @@ Replace `mongodb_uri` with the connection string copied from MongoDB Atlas. If t
 - MongoDB PHP Library documentation: https://www.mongodb.com/docs/php-library/current/
 - MongoDB PHP driver overview: https://www.mongodb.com/docs/drivers/php-drivers/
 - Composer download and installation: https://getcomposer.org/download/
+- Cloudinary PHP SDK: https://cloudinary.com/documentation/php_integration
 - XAMPP downloads and documentation: https://www.apachefriends.org/
