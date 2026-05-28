@@ -7,6 +7,7 @@ session_start();
 header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
+require __DIR__ . '/../pagination.php';
 
 function respond(int $statusCode, array $payload): void
 {
@@ -56,22 +57,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 $events = $db->selectCollection('events');
 $registrations = $db->selectCollection('registrations');
+$pagination = readPaginationParams();
+$query = [
+    'status' => [
+        '$nin' => ['Deleted', 'deleted', 'DELETED'],
+    ],
+    'deleted_at' => [
+        '$exists' => false,
+    ],
+];
+$total = $events->countDocuments($query);
+$pagination = clampPagination($pagination, $total);
 
 $cursor = $events->find(
-    [
-        'status' => [
-            '$nin' => ['Deleted', 'deleted', 'DELETED'],
-        ],
-        'deleted_at' => [
-            '$exists' => false,
-        ],
-    ],
+    $query,
     [
         'sort' => [
             'event_date' => 1,
             'event_time' => 1,
             'created_at' => -1,
         ],
+        'skip' => $pagination['skip'],
+        'limit' => $pagination['limit'],
     ]
 );
 
@@ -90,4 +97,5 @@ foreach ($cursor as $event) {
 respond(200, [
     'success' => true,
     'events' => $eventList,
+    'pagination' => paginationMeta($pagination['page'], $pagination['limit'], $total),
 ]);

@@ -1,6 +1,7 @@
 const API_BASE = '../api';
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560942485-b2a11cc13456?q=80&w=400';
 const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150';
+const DEFAULT_PAGE_LIMIT = 6;
 
 const state = {
     user: null,
@@ -10,6 +11,14 @@ const state = {
     posts: [],
     likedPosts: [],
     myPosts: [],
+    pagination: {
+        events: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        registrations: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        communityPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        postLikedPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        myPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+        profileLikedPosts: { page: 1, limit: DEFAULT_PAGE_LIMIT },
+    },
 };
 
 async function apiRequest(path, options = {}) {
@@ -213,6 +222,107 @@ function renderLoading(message = 'Connecting to database...') {
             <div class="loading-copy">${escapeHtml(message)}</div>
         </div>
     `;
+}
+
+function paginationParams(key) {
+    const current = state.pagination[key] || { page: 1, limit: DEFAULT_PAGE_LIMIT };
+    return `page=${encodeURIComponent(current.page || 1)}&limit=${encodeURIComponent(current.limit || DEFAULT_PAGE_LIMIT)}`;
+}
+
+function setPagination(key, pagination) {
+    if (!pagination) {
+        return;
+    }
+
+    const existing = state.pagination[key] || { page: 1, limit: DEFAULT_PAGE_LIMIT, total: 0 };
+    const merged = {
+        ...existing,
+        ...pagination,
+    };
+    const limit = Number(merged.limit || DEFAULT_PAGE_LIMIT);
+    const total = Number(merged.total || 0);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const page = Math.min(Number(merged.page || 1), totalPages);
+
+    state.pagination[key] = {
+        ...merged,
+        page,
+        limit,
+        total,
+        total_pages: totalPages,
+        has_previous: page > 1,
+        has_next: total > page * limit,
+    };
+}
+
+function pageNumbers(currentPage, totalPages) {
+    const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+
+    return [...pages]
+        .filter((page) => page >= 1 && page <= totalPages)
+        .sort((left, right) => left - right);
+}
+
+function renderPagination(key, pagination) {
+    if (!pagination || (pagination.total || 0) <= (pagination.limit || DEFAULT_PAGE_LIMIT) || (pagination.total_pages || 1) <= 1) {
+        return '';
+    }
+
+    const currentPage = pagination.page || 1;
+    const totalPages = pagination.total_pages || 1;
+    const pages = pageNumbers(currentPage, totalPages);
+    let lastPage = 0;
+
+    const pageButtons = pages.map((page) => {
+        const gap = page - lastPage > 1 ? '<span class="pagination-ellipsis">...</span>' : '';
+        lastPage = page;
+
+        return `${gap}<button type="button" class="pagination-btn ${page === currentPage ? 'is-active' : ''}" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${page}" ${page === currentPage ? 'aria-current="page"' : ''}>${page}</button>`;
+    }).join('');
+
+    return `
+        <nav class="pagination-bar" aria-label="Pagination">
+            <div class="pagination-summary">Page ${escapeHtml(currentPage)} of ${escapeHtml(totalPages)} - ${escapeHtml(pagination.total || 0)} total</div>
+            <div class="pagination-actions">
+                <button type="button" class="pagination-btn" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${currentPage - 1}" ${pagination.has_previous ? '' : 'disabled'}>Previous</button>
+                ${pageButtons}
+                <button type="button" class="pagination-btn" data-pagination-key="${escapeHtml(key)}" data-pagination-page="${currentPage + 1}" ${pagination.has_next ? '' : 'disabled'}>Next</button>
+            </div>
+        </nav>
+    `;
+}
+
+async function handlePaginationClick(event) {
+    const button = event.target.closest('[data-pagination-key][data-pagination-page]');
+
+    if (!button || button.disabled) {
+        return false;
+    }
+
+    const key = button.dataset.paginationKey;
+    const page = Number(button.dataset.paginationPage);
+
+    if (!Number.isInteger(page) || page < 1) {
+        return true;
+    }
+
+    setPagination(key, { page });
+
+    if (key === 'events') {
+        await renderEvents();
+    } else if (key === 'registrations') {
+        renderMyEvents(await loadMyRegistrations());
+    } else if (key === 'communityPosts') {
+        await renderCommunityPosts();
+    } else if (key === 'postLikedPosts') {
+        await renderLikedPosts();
+    } else if (key === 'myPosts') {
+        await renderMyPosts();
+    } else if (key === 'profileLikedPosts') {
+        await renderProfileLikedPosts();
+    }
+
+    return true;
 }
 
 function setInitialLoading() {
@@ -469,6 +579,10 @@ async function initEvents() {
     }
 
     document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
         const detailButton = event.target.closest('[data-event-detail]');
         const editButton = event.target.closest('[data-event-edit]');
         const deleteButton = event.target.closest('[data-event-delete]');
@@ -547,6 +661,9 @@ async function initEvents() {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
+            if (!payload.event_id) {
+                setPagination('events', { page: 1 });
+            }
             resetEventForm();
             setChecked('tab-admin-list');
             await renderEvents();
@@ -568,24 +685,43 @@ async function refreshEventViews() {
 }
 
 async function loadMyRegistrations() {
-    const data = await apiRequest('/registrations/my_registrations.php');
+    const data = await apiRequest(`/registrations/my_registrations.php?${paginationParams('registrations')}`);
     const registrations = data.registrations || [];
-    state.registeredEventIds = new Set(registrations.map((item) => item.event_id || item.event?.event_id).filter(Boolean));
+    setPagination('registrations', data.pagination);
     return registrations;
 }
 
 async function loadRegistrationState() {
     try {
-        return await loadMyRegistrations();
+        const registrations = await loadMyRegistrations();
+        await loadRegisteredEventIds();
+        return registrations;
     } catch {
         state.registeredEventIds = new Set();
         return [];
     }
 }
 
+async function loadRegisteredEventIds() {
+    const ids = [];
+    let page = 1;
+    let totalPages = 1;
+
+    do {
+        const data = await apiRequest(`/registrations/my_registrations.php?page=${page}&limit=50`);
+        const registrations = data.registrations || [];
+        ids.push(...registrations.map((item) => item.event_id || item.event?.event_id).filter(Boolean));
+        totalPages = data.pagination?.total_pages || 1;
+        page += 1;
+    } while (page <= totalPages);
+
+    state.registeredEventIds = new Set(ids);
+}
+
 async function renderEvents() {
-    const data = await apiRequest('/events/list.php');
+    const data = await apiRequest(`/events/list.php?${paginationParams('events')}`);
     const events = data.events || [];
+    setPagination('events', data.pagination);
     state.events = events;
 
     const userPanel = byId('panel-user-list');
@@ -596,6 +732,7 @@ async function renderEvents() {
             <div class="feed-header-title">Events</div>
             <div class="feed-header-subtitle">Explore upcoming anime activities on campus.</div>
             ${events.length ? events.map((event) => eventCard(event, { registered: state.registeredEventIds.has(event.event_id) })).join('') : renderEmpty('No events found.', 'event-item-card')}
+            ${renderPagination('events', state.pagination.events)}
         `;
     }
 
@@ -611,6 +748,7 @@ async function renderEvents() {
             ${isAdmin()
                 ? (events.length ? events.map((event) => eventCard(event, { admin: true })).join('') : renderEmpty('No events found.', 'event-item-card'))
                 : renderEmpty('Admin access required.', 'event-item-card')}
+            ${isAdmin() ? renderPagination('events', state.pagination.events) : ''}
         `;
     }
 }
@@ -628,6 +766,7 @@ function renderMyEvents(registrations = []) {
         ${registrations.length
             ? registrations.map((item) => eventCard({ ...item.event, status: item.status }, { registered: true, canCancel: true })).join('')
             : renderEmpty('You have not joined any events yet.', 'event-item-card')}
+        ${renderPagination('registrations', state.pagination.registrations)}
     `;
 }
 
@@ -746,6 +885,7 @@ async function initPosts() {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
+            setPagination('communityPosts', { page: 1 });
             form.reset();
             setChecked('tab-community');
             await Promise.allSettled([renderCommunityPosts(), renderLikedPosts()]);
@@ -754,7 +894,13 @@ async function initPosts() {
         }
     });
 
-    document.body.addEventListener('click', handlePostActionClick);
+    document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
+        await handlePostActionClick(event);
+    });
 }
 
 async function handlePostActionClick(event) {
@@ -965,13 +1111,15 @@ async function renderCommunityPosts() {
     const panel = byId('panel-community');
 
     try {
-        const data = await apiRequest('/posts/list.php');
+        const data = await apiRequest(`/posts/list.php?${paginationParams('communityPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('communityPosts', data.pagination);
         state.posts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">Community Square</div>
             <div class="feed-header-subtitle">See what's happening around the exhibition.</div>
             ${posts.length ? posts.map((post) => renderPostCard(post, { showCommentPreview: true })).join('') : renderEmpty('No posts found.')}
+            ${renderPagination('communityPosts', state.pagination.communityPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
@@ -982,13 +1130,15 @@ async function renderLikedPosts() {
     const panel = byId('panel-liked-posts-flow');
 
     try {
-        const data = await apiRequest('/profile/liked_posts.php');
+        const data = await apiRequest(`/profile/liked_posts.php?${paginationParams('postLikedPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('postLikedPosts', data.pagination);
         state.likedPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Like Post</div>
             <div class="feed-header-subtitle">Liked posts (${posts.length})</div>
             ${posts.length ? posts.map((post) => renderPostCard(post, { showCommentPreview: true })).join('') : renderEmpty('You have not liked any posts yet.')}
+            ${renderPagination('postLikedPosts', state.pagination.postLikedPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
@@ -1111,6 +1261,10 @@ async function initProfile() {
     });
 
     document.body.addEventListener('click', async (event) => {
+        if (await handlePaginationClick(event)) {
+            return;
+        }
+
         const detailButton = event.target.closest('[data-profile-detail-target]');
 
         if (detailButton) {
@@ -1170,13 +1324,15 @@ async function renderMyPosts() {
     const panel = byId('panel-sent-posts');
 
     try {
-        const data = await apiRequest('/profile/my_posts.php');
+        const data = await apiRequest(`/profile/my_posts.php?${paginationParams('myPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('myPosts', data.pagination);
         state.myPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Sent Post</div>
             <div class="feed-header-subtitle">Review all posts you have shared with the exhibition community.</div>
             <div class="scrollable-feed-list">${posts.length ? posts.map((post) => renderPostCard(post, { ownerTools: true, profileDetailTarget: 'sent', showCommentPreview: true })).join('') : renderEmpty('You have not published any posts yet.')}</div>
+            ${renderPagination('myPosts', state.pagination.myPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);
@@ -1187,13 +1343,15 @@ async function renderProfileLikedPosts() {
     const panel = byId('panel-like-posts');
 
     try {
-        const data = await apiRequest('/profile/liked_posts.php');
+        const data = await apiRequest(`/profile/liked_posts.php?${paginationParams('profileLikedPosts')}`);
         const posts = await withCommentPreview(data.posts || []);
+        setPagination('profileLikedPosts', data.pagination);
         state.likedPosts = posts;
         panel.innerHTML = `
             <div class="feed-header-title">My Like Post</div>
             <div class="feed-header-subtitle">Review all creative gallery updates you have liked.</div>
             <div class="scrollable-feed-list">${posts.length ? posts.map((post) => renderPostCard(post, { profileDetailTarget: 'liked', showCommentPreview: true })).join('') : renderEmpty('You have not liked any posts yet.')}</div>
+            ${renderPagination('profileLikedPosts', state.pagination.profileLikedPosts)}
         `;
     } catch (error) {
         panel.innerHTML = renderEmpty(error.message);

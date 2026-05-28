@@ -7,6 +7,7 @@ session_start();
 header('Content-Type: application/json');
 
 require __DIR__ . '/../../connect_db/db.php';
+require __DIR__ . '/../pagination.php';
 require __DIR__ . '/../posts/helpers.php';
 
 requireMethod('GET');
@@ -14,11 +15,13 @@ requireMethod('GET');
 $userId = requireLogin();
 $likes = $db->selectCollection('postLikes');
 $posts = $db->selectCollection('posts');
+$pagination = readPaginationParams();
+$query = [
+    'user_id' => $userId,
+];
 
 $cursor = $likes->find(
-    [
-        'user_id' => $userId,
-    ],
+    $query,
     [
         'sort' => [
             'created_at' => -1,
@@ -47,7 +50,12 @@ foreach ($cursor as $like) {
     ];
 }
 
+$total = count($postList);
+$pagination = clampPagination($pagination, $total);
+$postList = array_slice($postList, $pagination['skip'], $pagination['limit']);
+
 respond(200, [
     'success' => true,
     'posts' => $postList,
+    'pagination' => paginationMeta($pagination['page'], $pagination['limit'], $total),
 ]);
