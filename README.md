@@ -1,11 +1,31 @@
 # Event-Management-Website
-An anime event management web application for Taylor’s University, created using PHP, JavaScript, and MongoDB
 
-Tools Used:
-1. XAMPP
-2. Frontend: HTML, CSS
-3. Backend: PHP
-4. Database: MongoDB
+An anime event management web application for Taylor's University, created using PHP,
+JavaScript, and MongoDB.
+
+Students browse and join anime events; admins create and manage them. The project also
+includes a social feed with posts, images, likes, comments, and shares, plus user
+profiles.
+
+## Tools Used
+
+| Layer | Technology |
+| --- | --- |
+| Server | XAMPP (Apache + PHP) |
+| Frontend | HTML, CSS, vanilla JavaScript (`frontend/js/app.js`) |
+| Backend | PHP (JSON API, one file per endpoint) |
+| Database | MongoDB Atlas |
+| Image hosting | Cloudinary |
+
+## Prerequisites
+
+- **PHP 8.1 or newer.** The code uses array spread with string keys
+  (`api/pagination.php`), plus `match` expressions and `str_contains`. PHP 8.0 and
+  below fails at runtime, not at install time. Check with `php -v`
+- **XAMPP** (or any Apache + PHP setup)
+- **Composer**
+- **A MongoDB Atlas cluster** and its connection string
+- **A Cloudinary account** for image uploads
 
 
 
@@ -206,6 +226,50 @@ Replace the Cloudinary values with the credentials from your Cloudinary dashboar
 
 Do not commit real Cloudinary credentials to Git.
 
+### 5. Run the Application
+
+Place the project inside the XAMPP web root so Apache can serve it:
+
+```text
+macOS:   /Applications/XAMPP/xamppfiles/htdocs/Event-Management-Website
+Windows: C:\xampp\htdocs\Event-Management-Website
+```
+
+Start Apache from the XAMPP control panel, then open the login page:
+
+```text
+http://localhost/Event-Management-Website/frontend/Login.html
+```
+
+Register an account there, or log in with an existing one. After login the app
+redirects to `HomePage.html`. The other pages are `Event.html`, `Post.html`,
+`Profile.html`, and `Register.html`.
+
+The frontend calls the API through the relative path `../api`, so the project folder
+name must stay `Event-Management-Website` unless you also update `API_BASE` at the top
+of `frontend/js/app.js`.
+
+### 6. Create an Admin Account
+
+`api/auth/register.php` always creates users with `role` set to `user`, so an admin
+cannot be created through the interface. Every endpoint under `api/admin/events/`
+requires an admin session, which means event creation and management stay unreachable
+until a user is promoted directly in MongoDB.
+
+Register a normal account first, then promote it from the MongoDB Atlas UI or `mongosh`:
+
+```javascript
+use event_management
+
+db.users.updateOne(
+    { email: "your_email@example.com" },
+    { $set: { role: "admin" } }
+)
+```
+
+Log out and log back in so the new role is written into the session. Admins are
+redirected to the event management page after login.
+
 ## Using Cloudinary Uploads
 
 The project uploads images through this backend endpoint:
@@ -260,6 +324,112 @@ Successful upload response example:
 ```
 
 Use `image_url` as the value to store in MongoDB for avatars, events, or posts.
+
+## API Reference
+
+Every endpoint is a standalone PHP file, so the file path is the route. They all return
+JSON shaped as `{ "success": bool, "message": string, ... }` and accept either a JSON
+request body or ordinary form fields.
+
+Access levels: **public** needs no session, **login** requires a logged-in user, and
+**admin** requires a user whose `role` is `admin`.
+
+### Authentication
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| POST | `api/auth/register.php` | public | Create an account and start a session |
+| POST | `api/auth/login.php` | public | Log in |
+| POST | `api/auth/logout.php` | public | Destroy the session |
+
+### Events
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `api/events/list.php` | public | Paginated event list with joined counts and free slots |
+| GET | `api/events/detail.php` | public | One event; includes the caller's registration when logged in |
+
+### Admin - Events
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| POST | `api/admin/events/create.php` | admin | Create an event |
+| POST | `api/admin/events/update.php` | admin | Update an event |
+| POST | `api/admin/events/delete.php` | admin | Soft-delete an event |
+| GET | `api/admin/events/detail.php` | admin | Event detail, including soft-deleted records |
+
+### Registrations
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| POST | `api/registrations/join.php` | login | Join an event |
+| POST | `api/registrations/cancel.php` | login | Cancel a registration |
+| GET | `api/registrations/my_registrations.php` | login | The caller's registrations |
+
+### Posts
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `api/posts/list.php` | public | Paginated feed |
+| GET | `api/posts/detail.php` | public | One post with its comments |
+| POST | `api/posts/create.php` | login | Create a post |
+| POST | `api/posts/update.php` | login | Edit own post |
+| POST | `api/posts/delete.php` | login | Delete own post; admins may delete any |
+| POST | `api/posts/like.php` | login | Like a post |
+| POST | `api/posts/unlike.php` | login | Remove a like |
+| POST | `api/posts/comment.php` | login | Comment on a post |
+| POST | `api/posts/share.php` | login | Increment the share count |
+
+### Profile
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `api/profile/me.php` | login | The current session's user |
+| GET | `api/profile/view.php` | login | Another user's public profile |
+| POST | `api/profile/update.php` | login | Update own profile |
+| GET | `api/profile/my_posts.php` | login | The caller's posts |
+| GET | `api/profile/liked_posts.php` | login | Posts the caller liked |
+
+### Uploads
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| POST | `api/uploads/image.php` | login | Upload an image to Cloudinary; see the section above |
+
+### Pagination
+
+List endpoints accept `?page=` and `?limit=` (default 6, maximum 50) and return a
+`pagination` object with `page`, `limit`, `total`, `total_pages`, `has_previous`, and
+`has_next`. A page number beyond the last page is clamped to the last page.
+
+### Status Codes
+
+| Code | Meaning |
+| --- | --- |
+| 401 | Not logged in |
+| 403 | Logged in but not an admin |
+| 405 | Wrong HTTP method |
+| 409 | Email already registered |
+| 422 | Validation failed |
+
+## Feature Documentation
+
+The `explaination/` folder contains detailed walkthroughs of how each feature works:
+
+| Document | Topic |
+| --- | --- |
+| [1.database.md](explaination/1.database.md) | MongoDB collections and structure |
+| [2.login.md](explaination/2.login.md) | Login flow |
+| [3.register.md](explaination/3.register.md) | Registration and validation |
+| [4.session.md](explaination/4.session.md) | Session handling and cookie settings |
+| [5.userrole.md](explaination/5.userrole.md) | User and admin roles |
+| [6.interaction_db.md](explaination/6.interaction_db.md) | How the API talks to MongoDB |
+| [7.join_cancel_event.md](explaination/7.join_cancel_event.md) | Joining and cancelling events |
+| [8.image.md](explaination/8.image.md) | Image uploads |
+| [9.show_event_post.md](explaination/9.show_event_post.md) | Rendering events and posts |
+| [10.pagination.md](explaination/10.pagination.md) | Pagination |
+| [11.logout.md](explaination/11.logout.md) | Logout |
+| [12.create_event.md](explaination/12.create_event.md) | Creating events |
 
 ## References
 
