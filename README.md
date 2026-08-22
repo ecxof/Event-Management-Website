@@ -226,7 +226,42 @@ Replace the Cloudinary values with the credentials from your Cloudinary dashboar
 
 Do not commit real Cloudinary credentials to Git.
 
-### 5. Run the Application
+### 5. Seed the Database
+
+MongoDB creates collections on first write, so a brand-new cluster starts empty and the
+event and post pages have nothing to show. `scripts/seed_database.php` builds every
+collection the API uses, adds the indexes, and fills them with sample users, events,
+registrations, posts, likes, comments, and shares.
+
+Run it from the project root with the CLI PHP that has the mongodb extension:
+
+```bash
+php scripts/seed_database.php
+```
+
+It reads the connection string and database name from `connect_db/config.php`, the same
+file the website uses, so create that file first.
+
+The script refuses to run when the target database already holds records. Pass
+`--force` to drop those collections and rebuild them from scratch:
+
+```bash
+php scripts/seed_database.php --force
+```
+
+`--force` permanently deletes the existing `users`, `events`, `registrations`, `posts`,
+`postLikes`, `postComments`, and `postShares` collections.
+
+The seeded accounts all use placeholder passwords, printed in the script output. The
+admin account is:
+
+```text
+admin@taylors.edu.my / Admin1234
+```
+
+Change these passwords before showing the site to anyone outside the group.
+
+### 6. Run the Application
 
 Place the project inside the XAMPP web root so Apache can serve it:
 
@@ -249,12 +284,15 @@ The frontend calls the API through the relative path `../api`, so the project fo
 name must stay `Event-Management-Website` unless you also update `API_BASE` at the top
 of `frontend/js/app.js`.
 
-### 6. Create an Admin Account
+### 7. Create an Admin Account
 
 `api/auth/register.php` always creates users with `role` set to `user`, so an admin
 cannot be created through the interface. Every endpoint under `api/admin/events/`
 requires an admin session, which means event creation and management stay unreachable
 until a user is promoted directly in MongoDB.
+
+The seed script in step 5 already creates one admin account, so this step is only needed
+for an unseeded database or to promote a second admin.
 
 Register a normal account first, then promote it from the MongoDB Atlas UI or `mongosh`:
 
