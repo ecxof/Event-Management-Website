@@ -1,4 +1,5 @@
 connect_db/config.php
+connect_db/config.php.*
 vendor/
 composer-setup.php
 composer.phar
