@@ -230,8 +230,8 @@ Do not commit real Cloudinary credentials to Git.
 
 MongoDB creates collections on first write, so a brand-new cluster starts empty and the
 event and post pages have nothing to show. `scripts/seed_database.php` builds every
-collection the API uses, adds the indexes, and fills them with sample users, events,
-registrations, posts, likes, comments, and shares.
+collection the API uses, adds the indexes those endpoints query on, and fills them with
+sample content.
 
 Run it from the project root with the CLI PHP that has the mongodb extension:
 
@@ -239,11 +239,28 @@ Run it from the project root with the CLI PHP that has the mongodb extension:
 php scripts/seed_database.php
 ```
 
-It reads the connection string and database name from `connect_db/config.php`, the same
-file the website uses, so create that file first.
+It reads the connection string and database name from `connect_db/config.php`, so create
+that file first. The sample content itself lives in `scripts/seed_data.json`, which keeps
+the PHP file to logic only. Edit the JSON to change the seeded users, events, or posts.
 
-The script refuses to run when the target database already holds records. Pass
-`--force` to drop those collections and rebuild them from scratch:
+What gets created:
+
+| Collection | Documents |
+| --- | --- |
+| `users` | 16 (1 admin, 15 students) |
+| `events` | 25 (18 Upcoming, 2 Full, 3 Closed, 2 soft-deleted) |
+| `registrations` | 207 (183 joined, 24 cancelled) |
+| `posts` | 30 (29 active, 1 soft-deleted) |
+| `postLikes` | 177 |
+| `postComments` | 39 |
+| `postShares` | 48 |
+
+That leaves 23 events and 29 posts visible to the list endpoints, which is four and five
+pages respectively at the default limit of 6, so pagination has something real to page
+through.
+
+The script refuses to run when the target database already holds records. Pass `--force`
+to drop those collections and rebuild them from scratch:
 
 ```bash
 php scripts/seed_database.php --force
@@ -252,8 +269,8 @@ php scripts/seed_database.php --force
 `--force` permanently deletes the existing `users`, `events`, `registrations`, `posts`,
 `postLikes`, `postComments`, and `postShares` collections.
 
-The seeded accounts all use placeholder passwords, printed in the script output. The
-admin account is:
+Every seeded account uses a placeholder password, printed in the script output. Students
+share `Student1234`, and the admin account is:
 
 ```text
 admin@taylors.edu.my / Admin1234

@@ -1,0 +1,1580 @@
+{
+  "_comment": "Seed content for scripts/seed_database.php. Day counts are offsets back from the moment the seed script runs.",
+  "users": [
+    {
+      "key": "admin",
+      "username": "Event Admin",
+      "email": "admin@taylors.edu.my",
+      "password": "Admin1234",
+      "role": "admin",
+      "anime_interest": "Event Management",
+      "telephone": 60123456789,
+      "registered_days_ago": 150
+    },
+    {
+      "key": "amir",
+      "username": "Amir Reza",
+      "email": "amir.reza@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Attack on Titan",
+      "telephone": 60129876543,
+      "registered_days_ago": 140
+    },
+    {
+      "key": "junyi",
+      "username": "Zhang JunYi",
+      "email": "zhang.junyi@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Jujutsu Kaisen",
+      "telephone": 60125550111,
+      "registered_days_ago": 138
+    },
+    {
+      "key": "shuhao",
+      "username": "Yang Shuhao",
+      "email": "yang.shuhao@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "One Piece",
+      "telephone": 60125550222,
+      "registered_days_ago": 135
+    },
+    {
+      "key": "shurui",
+      "username": "Yang Shurui",
+      "email": "yang.shurui@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Demon Slayer",
+      "telephone": 60125550333,
+      "registered_days_ago": 133
+    },
+    {
+      "key": "meiling",
+      "username": "Tan Mei Ling",
+      "email": "tan.meiling@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Spy x Family",
+      "telephone": 60125550444,
+      "registered_days_ago": 128
+    },
+    {
+      "key": "arif",
+      "username": "Muhammad Arif",
+      "email": "muhammad.arif@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Naruto",
+      "telephone": 60125550555,
+      "registered_days_ago": 121
+    },
+    {
+      "key": "priya",
+      "username": "Priya Nair",
+      "email": "priya.nair@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Your Name",
+      "telephone": 60125550666,
+      "registered_days_ago": 114
+    },
+    {
+      "key": "weijie",
+      "username": "Lim Wei Jie",
+      "email": "lim.weijie@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Vinland Saga",
+      "telephone": 60125550777,
+      "registered_days_ago": 108
+    },
+    {
+      "key": "aisyah",
+      "username": "Nur Aisyah",
+      "email": "nur.aisyah@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Fruits Basket",
+      "telephone": 60125550888,
+      "registered_days_ago": 102
+    },
+    {
+      "key": "xiaoyu",
+      "username": "Chen Xiaoyu",
+      "email": "chen.xiaoyu@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Chainsaw Man",
+      "telephone": 60125550999,
+      "registered_days_ago": 96
+    },
+    {
+      "key": "rajesh",
+      "username": "Rajesh Kumar",
+      "email": "rajesh.kumar@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Mob Psycho 100",
+      "telephone": 60125551010,
+      "registered_days_ago": 88
+    },
+    {
+      "key": "nadia",
+      "username": "Siti Nadia",
+      "email": "siti.nadia@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Violet Evergarden",
+      "telephone": 60125551111,
+      "registered_days_ago": 81
+    },
+    {
+      "key": "kahhoe",
+      "username": "Wong Kah Hoe",
+      "email": "wong.kahhoe@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Gundam",
+      "telephone": 60125551212,
+      "registered_days_ago": 74
+    },
+    {
+      "key": "farah",
+      "username": "Farah Zulkifli",
+      "email": "farah.zulkifli@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Sailor Moon",
+      "telephone": 60125551313,
+      "registered_days_ago": 63
+    },
+    {
+      "key": "daniel",
+      "username": "Daniel Lee",
+      "email": "daniel.lee@sd.taylors.edu.my",
+      "password": "Student1234",
+      "role": "user",
+      "anime_interest": "Cowboy Bebop",
+      "telephone": 60125551414,
+      "registered_days_ago": 52
+    }
+  ],
+  "events": [
+    {
+      "key": "cosplay-night",
+      "title": "Anime Cosplay Night 2026",
+      "category": "Cosplay",
+      "description": "Dress up as your favourite anime character and walk the runway. Prizes for best costume, best group, and best handmade prop.",
+      "event_date": "2026-09-18",
+      "event_time": "19:00",
+      "location": "Grand Hall, Taylor's Lakeside Campus",
+      "capacity": 100,
+      "status": null,
+      "created_days_ago": 40,
+      "joined": [
+        "amir",
+        "arif",
+        "daniel",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "rajesh",
+        "shuhao",
+        "xiaoyu"
+      ],
+      "cancelled": []
+    },
+    {
+      "key": "manga-workshop",
+      "title": "Manga Drawing Workshop",
+      "category": "Workshop",
+      "description": "A hands-on session covering panel layout, inking, and screentones. Materials are provided and no drawing experience is needed.",
+      "event_date": "2026-09-26",
+      "event_time": "14:00",
+      "location": "Design Studio, Block D",
+      "capacity": 30,
+      "status": null,
+      "created_days_ago": 36,
+      "joined": [
+        "aisyah",
+        "amir",
+        "arif",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "priya",
+        "rajesh",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "shuhao",
+        "weijie"
+      ]
+    },
+    {
+      "key": "amv-festival",
+      "title": "Anime Music Video Festival",
+      "category": "Music",
+      "description": "A screening night for student-made AMVs, followed by live voting and a short editing talk from last year's winner.",
+      "event_date": "2026-10-03",
+      "event_time": "18:30",
+      "location": "Auditorium 1",
+      "capacity": 6,
+      "status": null,
+      "created_days_ago": 30,
+      "joined": [
+        "aisyah",
+        "amir",
+        "farah",
+        "meiling",
+        "nadia",
+        "priya"
+      ],
+      "cancelled": [
+        "xiaoyu"
+      ]
+    },
+    {
+      "key": "culture-day",
+      "title": "Japanese Culture Day",
+      "category": "Culture",
+      "description": "Try calligraphy, origami, and a tea ceremony demonstration, with a Japanese street-food corner running all afternoon.",
+      "event_date": "2026-10-11",
+      "event_time": "10:00",
+      "location": "Student Life Centre",
+      "capacity": 80,
+      "status": null,
+      "created_days_ago": 27,
+      "joined": [
+        "rajesh",
+        "shuhao",
+        "shurui"
+      ],
+      "cancelled": [
+        "nadia"
+      ]
+    },
+    {
+      "key": "movie-marathon",
+      "title": "Anime Movie Marathon",
+      "category": "Screening",
+      "description": "An overnight screening of three classic anime films, with free popcorn and a discussion session between each showing.",
+      "event_date": "2026-07-25",
+      "event_time": "20:00",
+      "location": "Lecture Theatre 3",
+      "capacity": 50,
+      "status": "Closed",
+      "created_days_ago": 70,
+      "joined": [
+        "aisyah",
+        "amir",
+        "arif",
+        "junyi",
+        "kahhoe",
+        "priya",
+        "shuhao"
+      ],
+      "cancelled": [
+        "farah"
+      ]
+    },
+    {
+      "key": "photography",
+      "title": "Cosplay Photography Session",
+      "category": "Photography",
+      "description": "Bring your costume and camera to a guided outdoor shoot around the lake. Lighting gear and a photographer mentor are on site.",
+      "event_date": "2026-10-24",
+      "event_time": "16:00",
+      "location": "Campus Lakeside Park",
+      "capacity": 25,
+      "status": null,
+      "created_days_ago": 21,
+      "joined": [
+        "aisyah",
+        "arif",
+        "junyi",
+        "meiling",
+        "shuhao",
+        "shurui"
+      ],
+      "cancelled": []
+    },
+    {
+      "key": "anime-quiz",
+      "title": "Anime Quiz Championship",
+      "category": "Competition",
+      "description": "Teams of three compete across four rounds of anime trivia, from opening themes to obscure side characters.",
+      "event_date": "2026-11-07",
+      "event_time": "15:00",
+      "location": "Seminar Room 2",
+      "capacity": 40,
+      "status": null,
+      "created_days_ago": 14,
+      "joined": [
+        "arif",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "rajesh",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "priya"
+      ]
+    },
+    {
+      "key": "game-night",
+      "title": "Otaku Game Night",
+      "category": "Games",
+      "description": "A casual evening of anime fighting games and rhythm games on the big screen.",
+      "event_date": "2026-11-21",
+      "event_time": "18:00",
+      "location": "Recreation Room",
+      "capacity": 60,
+      "status": "Deleted",
+      "created_days_ago": 11,
+      "joined": [],
+      "cancelled": []
+    },
+    {
+      "key": "voice-acting",
+      "title": "Voice Acting Masterclass",
+      "category": "Workshop",
+      "description": "A guest dubbing artist walks through script reading, breath control, and recording a short scene in the campus booth.",
+      "event_date": "2026-11-14",
+      "event_time": "13:00",
+      "location": "Media Lab, Block C",
+      "capacity": 20,
+      "status": null,
+      "created_days_ago": 33,
+      "joined": [
+        "aisyah",
+        "amir",
+        "arif",
+        "daniel",
+        "junyi",
+        "meiling",
+        "nadia",
+        "priya",
+        "rajesh",
+        "shurui",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "farah"
+      ]
+    },
+    {
+      "key": "ghibli-night",
+      "title": "Studio Ghibli Appreciation Night",
+      "category": "Screening",
+      "description": "Two Ghibli features back to back, with a short talk on the studio's background art before the first screening.",
+      "event_date": "2026-10-17",
+      "event_time": "19:30",
+      "location": "Lecture Theatre 1",
+      "capacity": 70,
+      "status": null,
+      "created_days_ago": 29,
+      "joined": [
+        "amir",
+        "arif",
+        "daniel",
+        "kahhoe",
+        "nadia",
+        "shuhao",
+        "shurui",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "farah"
+      ]
+    },
+    {
+      "key": "figure-painting",
+      "title": "Anime Figure Painting Clinic",
+      "category": "Workshop",
+      "description": "Learn to prime, shade, and seal resin figures. Bring your own kit or use one of the practice figures provided.",
+      "event_date": "2026-12-05",
+      "event_time": "11:00",
+      "location": "Art Room 2",
+      "capacity": 18,
+      "status": null,
+      "created_days_ago": 25,
+      "joined": [
+        "aisyah",
+        "arif",
+        "farah",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "shuhao",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "daniel",
+        "shurui"
+      ]
+    },
+    {
+      "key": "dance-battle",
+      "title": "J-Pop Dance Cover Battle",
+      "category": "Performance",
+      "description": "Solo and group dance covers judged on synchronisation, formation, and stage presence. Open to all skill levels.",
+      "event_date": "2026-12-12",
+      "event_time": "17:00",
+      "location": "Student Plaza",
+      "capacity": 45,
+      "status": null,
+      "created_days_ago": 24,
+      "joined": [
+        "aisyah",
+        "arif",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "shuhao",
+        "shurui",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "farah",
+        "rajesh"
+      ]
+    },
+    {
+      "key": "sports-day",
+      "title": "Shonen Sports Day",
+      "category": "Sports",
+      "description": "Relay races, tug of war, and an obstacle course, all themed around classic shonen training arcs.",
+      "event_date": "2026-08-08",
+      "event_time": "09:00",
+      "location": "Sports Complex",
+      "capacity": 64,
+      "status": "Closed",
+      "created_days_ago": 78,
+      "joined": [
+        "amir",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "rajesh",
+        "shurui",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "arif",
+        "junyi"
+      ]
+    },
+    {
+      "key": "soundtrack-concert",
+      "title": "Anime Soundtrack Concert",
+      "category": "Music",
+      "description": "The campus orchestra performs arrangements of well-known anime scores, with a student choir joining for the finale.",
+      "event_date": "2027-01-16",
+      "event_time": "20:00",
+      "location": "Grand Hall, Taylor's Lakeside Campus",
+      "capacity": 120,
+      "status": null,
+      "created_days_ago": 20,
+      "joined": [
+        "amir",
+        "daniel",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "priya",
+        "rajesh",
+        "shuhao",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "meiling",
+        "nadia"
+      ]
+    },
+    {
+      "key": "book-swap",
+      "title": "Manga Book Swap",
+      "category": "Community",
+      "description": "Bring manga volumes you have finished and trade them for something new. Unclaimed books go to the campus library.",
+      "event_date": "2026-11-28",
+      "event_time": "12:00",
+      "location": "Library Foyer",
+      "capacity": 35,
+      "status": null,
+      "created_days_ago": 18,
+      "joined": [
+        "amir",
+        "daniel",
+        "junyi",
+        "meiling",
+        "nadia",
+        "rajesh",
+        "shuhao",
+        "shurui",
+        "weijie"
+      ],
+      "cancelled": [
+        "aisyah",
+        "kahhoe"
+      ]
+    },
+    {
+      "key": "tabletop-night",
+      "title": "Isekai Tabletop RPG Night",
+      "category": "Games",
+      "description": "One-shot tabletop campaigns with an isekai premise. Game masters and character sheets are provided for beginners.",
+      "event_date": "2026-12-19",
+      "event_time": "18:30",
+      "location": "Recreation Room",
+      "capacity": 24,
+      "status": null,
+      "created_days_ago": 17,
+      "joined": [
+        "daniel",
+        "kahhoe",
+        "nadia",
+        "priya",
+        "shuhao",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "amir",
+        "rajesh"
+      ]
+    },
+    {
+      "key": "design-talk",
+      "title": "Anime Character Design Talk",
+      "category": "Talk",
+      "description": "A working illustrator breaks down silhouette, colour scripting, and how character design carries story information.",
+      "event_date": "2026-09-05",
+      "event_time": "15:00",
+      "location": "Seminar Room 4",
+      "capacity": 55,
+      "status": "Closed",
+      "created_days_ago": 62,
+      "joined": [
+        "amir",
+        "arif",
+        "farah",
+        "kahhoe",
+        "meiling",
+        "rajesh",
+        "shuhao",
+        "shurui",
+        "weijie"
+      ],
+      "cancelled": [
+        "priya"
+      ]
+    },
+    {
+      "key": "prop-bootcamp",
+      "title": "Cosplay Prop Building Bootcamp",
+      "category": "Workshop",
+      "description": "A full-day session on foam cutting, heat shaping, and weathering, ending with a finished prop to take home.",
+      "event_date": "2027-01-23",
+      "event_time": "10:00",
+      "location": "Workshop Bay, Block E",
+      "capacity": 16,
+      "status": null,
+      "created_days_ago": 15,
+      "joined": [
+        "aisyah",
+        "amir",
+        "daniel",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "priya",
+        "shuhao",
+        "shurui",
+        "weijie"
+      ],
+      "cancelled": []
+    },
+    {
+      "key": "trivia-speed",
+      "title": "Anime Trivia Speed Round",
+      "category": "Competition",
+      "description": "A fast lunchtime knockout: ten seconds per question, one wrong answer and you are out.",
+      "event_date": "2026-10-30",
+      "event_time": "16:30",
+      "location": "Cafeteria Stage",
+      "capacity": 8,
+      "status": null,
+      "created_days_ago": 13,
+      "joined": [
+        "aisyah",
+        "amir",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "shuhao",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "rajesh"
+      ]
+    },
+    {
+      "key": "language-corner",
+      "title": "Japanese Language Corner",
+      "category": "Culture",
+      "description": "A relaxed conversation hour for beginners, with volunteers from the Japanese language programme leading small groups.",
+      "event_date": "2026-11-01",
+      "event_time": "14:00",
+      "location": "Language Centre",
+      "capacity": 30,
+      "status": null,
+      "created_days_ago": 12,
+      "joined": [
+        "aisyah",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "shuhao",
+        "shurui",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "farah"
+      ]
+    },
+    {
+      "key": "model-kit",
+      "title": "Mecha Model Kit Build-Off",
+      "category": "Competition",
+      "description": "Teams race to assemble and panel-line a grade kit within three hours. Judged on cleanliness and finish.",
+      "event_date": "2027-02-06",
+      "event_time": "13:00",
+      "location": "Engineering Lab 2",
+      "capacity": 20,
+      "status": null,
+      "created_days_ago": 10,
+      "joined": [
+        "arif",
+        "daniel",
+        "junyi",
+        "meiling",
+        "nadia",
+        "rajesh",
+        "xiaoyu"
+      ],
+      "cancelled": []
+    },
+    {
+      "key": "karaoke-night",
+      "title": "Anime Opening Karaoke Night",
+      "category": "Music",
+      "description": "An open microphone night for anime openings and endings. Lyrics on screen, no judgement, snacks included.",
+      "event_date": "2026-12-27",
+      "event_time": "19:00",
+      "location": "Student Lounge",
+      "capacity": 50,
+      "status": null,
+      "created_days_ago": 9,
+      "joined": [
+        "aisyah",
+        "arif",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "rajesh",
+        "shuhao",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": [
+        "amir"
+      ]
+    },
+    {
+      "key": "webtoon-club",
+      "title": "Manhwa and Webtoon Reading Club",
+      "category": "Community",
+      "description": "A monthly meetup to discuss ongoing webtoons and recommend new series to the group.",
+      "event_date": "2026-09-12",
+      "event_time": "16:00",
+      "location": "Library Discussion Room",
+      "capacity": 22,
+      "status": "Deleted",
+      "created_days_ago": 45,
+      "joined": [],
+      "cancelled": []
+    },
+    {
+      "key": "career-panel",
+      "title": "Anime Industry Career Panel",
+      "category": "Talk",
+      "description": "Panellists from animation, localisation, and event production talk about how they entered the industry from Malaysia.",
+      "event_date": "2027-01-09",
+      "event_time": "11:00",
+      "location": "Auditorium 2",
+      "capacity": 90,
+      "status": null,
+      "created_days_ago": 8,
+      "joined": [
+        "aisyah",
+        "amir",
+        "farah",
+        "meiling",
+        "shuhao",
+        "weijie",
+        "xiaoyu"
+      ],
+      "cancelled": []
+    },
+    {
+      "key": "fan-meetup",
+      "title": "New Year Anime Fan Meetup",
+      "category": "Community",
+      "description": "An informal start-of-semester meetup for new students to find club members who watch the same series.",
+      "event_date": "2027-02-20",
+      "event_time": "18:00",
+      "location": "Student Life Centre",
+      "capacity": 75,
+      "status": null,
+      "created_days_ago": 6,
+      "joined": [
+        "meiling",
+        "priya",
+        "shuhao"
+      ],
+      "cancelled": []
+    }
+  ],
+  "posts": [
+    {
+      "key": "countdown",
+      "author": "amir",
+      "title": "Cosplay Night countdown has started",
+      "content": "Three weeks left before Cosplay Night and my armour is still half painted. If anyone has spare EVA foam, I will trade snacks for it.",
+      "created_days_ago": 25,
+      "status": null,
+      "likes": [
+        "farah",
+        "rajesh",
+        "shurui"
+      ],
+      "shares": [
+        "aisyah",
+        "arif",
+        "shuhao"
+      ]
+    },
+    {
+      "key": "supplies",
+      "author": "junyi",
+      "title": "What to bring to the manga workshop",
+      "content": "The studio provides pens and paper, but bring your own eraser and a reference sheet of the character you want to draw. It saves a lot of time.",
+      "created_days_ago": 19,
+      "status": null,
+      "likes": [
+        "farah",
+        "priya",
+        "shuhao",
+        "weijie"
+      ],
+      "shares": [
+        "priya"
+      ]
+    },
+    {
+      "key": "amv-lineup",
+      "author": "shuhao",
+      "title": "AMV Festival lineup is looking strong",
+      "content": "Watched a few of the submitted edits during rehearsal. The sync work this year is on another level, definitely worth getting a seat early.",
+      "created_days_ago": 12,
+      "status": null,
+      "likes": [
+        "amir"
+      ],
+      "shares": []
+    },
+    {
+      "key": "season",
+      "author": "meiling",
+      "title": "Best anime of the season?",
+      "content": "Curious what everyone is watching right now. I have been rewatching Spy x Family between classes and it still holds up.",
+      "created_days_ago": 8,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "arif",
+        "farah",
+        "kahhoe",
+        "nadia",
+        "priya",
+        "shuhao",
+        "shurui",
+        "weijie"
+      ],
+      "shares": [
+        "arif",
+        "junyi"
+      ]
+    },
+    {
+      "key": "marathon-photos",
+      "author": "priya",
+      "title": "Photos from the movie marathon",
+      "content": "Finally sorted through the shots from the overnight screening. Everyone looked exhausted by the third film but nobody left early.",
+      "created_days_ago": 5,
+      "status": null,
+      "likes": [
+        "amir",
+        "shuhao",
+        "shurui"
+      ],
+      "shares": []
+    },
+    {
+      "key": "old-notice",
+      "author": "arif",
+      "title": "Old club notice",
+      "content": "Posted the wrong venue for the quiz night, please ignore this one.",
+      "created_days_ago": 30,
+      "status": "deleted",
+      "likes": [],
+      "shares": []
+    },
+    {
+      "key": "ghibli-recs",
+      "author": "aisyah",
+      "title": "Which Ghibli film should open the night?",
+      "content": "We can only fit two features into the screening slot. I am leaning towards one quiet film and one adventure, but the vote is still open.",
+      "created_days_ago": 22,
+      "status": null,
+      "likes": [
+        "amir",
+        "arif",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "rajesh",
+        "xiaoyu"
+      ],
+      "shares": []
+    },
+    {
+      "key": "figure-first-try",
+      "author": "kahhoe",
+      "title": "First attempt at figure painting",
+      "content": "Thinned the paint too much on the first coat and it pooled everywhere. Stripped it and started again, second attempt is much cleaner.",
+      "created_days_ago": 17,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "arif",
+        "daniel",
+        "farah",
+        "nadia",
+        "shuhao"
+      ],
+      "shares": []
+    },
+    {
+      "key": "dance-practice",
+      "author": "farah",
+      "title": "Dance cover practice room booking",
+      "content": "Booked the practice room every Tuesday evening until the battle. Anyone in a group is welcome to share the slot, there is more than enough space.",
+      "created_days_ago": 16,
+      "status": null,
+      "likes": [
+        "daniel",
+        "meiling",
+        "nadia",
+        "xiaoyu"
+      ],
+      "shares": [
+        "arif",
+        "junyi",
+        "nadia"
+      ]
+    },
+    {
+      "key": "sports-day-recap",
+      "author": "weijie",
+      "title": "Shonen Sports Day was a disaster in the best way",
+      "content": "Our relay team dropped the baton twice and still somehow placed third. The obstacle course was harder than it looked in the poster.",
+      "created_days_ago": 76,
+      "status": null,
+      "likes": [
+        "shurui"
+      ],
+      "shares": [
+        "arif",
+        "meiling",
+        "nadia"
+      ]
+    },
+    {
+      "key": "orchestra-preview",
+      "author": "nadia",
+      "title": "Heard the orchestra rehearse the concert set",
+      "content": "Walked past the hall during rehearsal and stayed for twenty minutes. The string arrangement of the finale is worth the ticket on its own.",
+      "created_days_ago": 15,
+      "status": null,
+      "likes": [
+        "arif",
+        "daniel",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "priya",
+        "rajesh",
+        "shuhao",
+        "shurui"
+      ],
+      "shares": [
+        "amir",
+        "arif"
+      ]
+    },
+    {
+      "key": "swap-haul",
+      "author": "xiaoyu",
+      "title": "What I am bringing to the book swap",
+      "content": "Clearing out about fifteen volumes I have already finished. Mostly sports manga and a few one-shots, all in good condition.",
+      "created_days_ago": 14,
+      "status": null,
+      "likes": [
+        "arif"
+      ],
+      "shares": [
+        "weijie"
+      ]
+    },
+    {
+      "key": "rpg-setup",
+      "author": "rajesh",
+      "title": "Running a table at the tabletop night",
+      "content": "I will be game mastering one of the beginner tables. No experience needed, the character sheets are already filled in, just show up and pick one.",
+      "created_days_ago": 13,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "daniel",
+        "meiling",
+        "shuhao",
+        "shurui"
+      ],
+      "shares": [
+        "shuhao"
+      ]
+    },
+    {
+      "key": "design-talk-notes",
+      "author": "daniel",
+      "title": "Notes from the character design talk",
+      "content": "The section on silhouette testing was the most useful part. The idea that a design should read at thumbnail size changed how I sketch.",
+      "created_days_ago": 58,
+      "status": null,
+      "likes": [
+        "amir",
+        "farah",
+        "kahhoe",
+        "nadia",
+        "shuhao",
+        "xiaoyu"
+      ],
+      "shares": [
+        "rajesh",
+        "weijie"
+      ]
+    },
+    {
+      "key": "prop-materials",
+      "author": "amir",
+      "title": "Material list for the prop bootcamp",
+      "content": "Bringing foam, contact cement, and a heat gun. The organisers said blades are provided, so leave your cutters at home.",
+      "created_days_ago": 11,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "daniel",
+        "farah",
+        "kahhoe",
+        "nadia",
+        "priya",
+        "shuhao",
+        "weijie"
+      ],
+      "shares": [
+        "farah",
+        "meiling",
+        "priya"
+      ]
+    },
+    {
+      "key": "trivia-warmup",
+      "author": "junyi",
+      "title": "Trivia speed round warm-up questions",
+      "content": "Posting a few practice questions in the club chat every day this week. Ten seconds each, same format as the real thing.",
+      "created_days_ago": 10,
+      "status": null,
+      "likes": [
+        "daniel",
+        "meiling",
+        "rajesh",
+        "shuhao"
+      ],
+      "shares": [
+        "shurui"
+      ]
+    },
+    {
+      "key": "language-corner-invite",
+      "author": "aisyah",
+      "title": "Beginners are genuinely welcome at language corner",
+      "content": "A few people asked if they need to know kana first. You do not. Last week half the table was learning greetings from scratch.",
+      "created_days_ago": 9,
+      "status": null,
+      "likes": [
+        "amir",
+        "arif",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "priya",
+        "rajesh",
+        "shuhao",
+        "shurui"
+      ],
+      "shares": [
+        "arif",
+        "priya",
+        "shurui"
+      ]
+    },
+    {
+      "key": "model-kit-tools",
+      "author": "kahhoe",
+      "title": "Tool advice for the model kit build-off",
+      "content": "A cheap nipper will leave stress marks on every cut. If you are buying one tool before the competition, make it a decent single-blade nipper.",
+      "created_days_ago": 8,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "daniel",
+        "meiling",
+        "nadia",
+        "priya",
+        "rajesh",
+        "weijie",
+        "xiaoyu"
+      ],
+      "shares": [
+        "aisyah",
+        "shurui",
+        "xiaoyu"
+      ]
+    },
+    {
+      "key": "karaoke-songlist",
+      "author": "farah",
+      "title": "Karaoke night song list is open",
+      "content": "Add your song to the shared sheet so we can space out the ballads. Currently there are nine people signed up for the same opening.",
+      "created_days_ago": 7,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "meiling",
+        "nadia",
+        "priya",
+        "rajesh",
+        "shuhao",
+        "weijie"
+      ],
+      "shares": [
+        "junyi",
+        "shurui",
+        "weijie"
+      ]
+    },
+    {
+      "key": "career-panel-questions",
+      "author": "priya",
+      "title": "What to ask the career panel",
+      "content": "We can submit questions in advance. I am asking about localisation work specifically, since nobody ever covers that path.",
+      "created_days_ago": 6,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "rajesh",
+        "shurui",
+        "weijie",
+        "xiaoyu"
+      ],
+      "shares": [
+        "arif",
+        "kahhoe"
+      ]
+    },
+    {
+      "key": "new-member-intro",
+      "author": "nadia",
+      "title": "Introducing yourself at the fan meetup",
+      "content": "If you are new this semester, the meetup is the easiest way in. Bring one series you are currently watching and you will find your group.",
+      "created_days_ago": 5,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "arif",
+        "daniel",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "meiling",
+        "rajesh",
+        "shurui"
+      ],
+      "shares": [
+        "arif",
+        "rajesh",
+        "weijie"
+      ]
+    },
+    {
+      "key": "photo-tips",
+      "author": "shuhao",
+      "title": "Camera settings for the cosplay shoot",
+      "content": "Shooting outdoors near the lake means harsh light around noon. A wide aperture and a reflector will save most of your shots.",
+      "created_days_ago": 20,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "junyi",
+        "meiling",
+        "rajesh"
+      ],
+      "shares": [
+        "rajesh"
+      ]
+    },
+    {
+      "key": "quiz-team",
+      "author": "shurui",
+      "title": "Looking for a third for the quiz championship",
+      "content": "Teams are three people and we are two. Strong on shonen, weak on anything before 2000, so ideally someone who has watched the classics.",
+      "created_days_ago": 13,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "arif",
+        "daniel",
+        "farah",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "rajesh",
+        "weijie"
+      ],
+      "shares": [
+        "amir",
+        "priya"
+      ]
+    },
+    {
+      "key": "culture-day-food",
+      "author": "arif",
+      "title": "Food stalls confirmed for Culture Day",
+      "content": "Three stalls confirmed so far: takoyaki, taiyaki, and a cold noodle stand. All halal certified, the certificates are with the organisers.",
+      "created_days_ago": 21,
+      "status": null,
+      "likes": [
+        "daniel",
+        "farah",
+        "junyi",
+        "kahhoe",
+        "nadia",
+        "priya",
+        "weijie",
+        "xiaoyu"
+      ],
+      "shares": [
+        "daniel",
+        "xiaoyu"
+      ]
+    },
+    {
+      "key": "workshop-recap",
+      "author": "meiling",
+      "title": "Manga workshop recap for anyone who missed it",
+      "content": "We covered panel flow and basic inking. The instructor shared the practice sheets afterwards, ask in the chat if you want a copy.",
+      "created_days_ago": 18,
+      "status": null,
+      "likes": [
+        "amir",
+        "nadia"
+      ],
+      "shares": []
+    },
+    {
+      "key": "amv-editing",
+      "author": "xiaoyu",
+      "title": "Software for editing your AMV",
+      "content": "You do not need an expensive editor. Everything I submitted last year was cut in free software, the timing matters far more than the tools.",
+      "created_days_ago": 23,
+      "status": null,
+      "likes": [
+        "amir",
+        "daniel",
+        "kahhoe",
+        "meiling",
+        "nadia",
+        "priya",
+        "shuhao",
+        "weijie"
+      ],
+      "shares": [
+        "meiling",
+        "shuhao"
+      ]
+    },
+    {
+      "key": "volunteer-call",
+      "author": "admin",
+      "title": "Volunteers needed for the October events",
+      "content": "We need help with registration desks and crowd flow for Culture Day and the Ghibli screening. Volunteer hours count towards club credit.",
+      "created_days_ago": 26,
+      "status": null,
+      "likes": [
+        "amir",
+        "daniel",
+        "meiling",
+        "shuhao"
+      ],
+      "shares": [
+        "nadia"
+      ]
+    },
+    {
+      "key": "lost-and-found",
+      "author": "admin",
+      "title": "Lost and found after the movie marathon",
+      "content": "One jacket, a phone charger, and a set of keys were left in Lecture Theatre 3. Collect them from the student services counter.",
+      "created_days_ago": 4,
+      "status": null,
+      "likes": [
+        "arif",
+        "daniel",
+        "meiling",
+        "priya",
+        "rajesh",
+        "shuhao",
+        "weijie",
+        "xiaoyu"
+      ],
+      "shares": [
+        "daniel"
+      ]
+    },
+    {
+      "key": "cosplay-progress",
+      "author": "aisyah",
+      "title": "Cosplay progress thread",
+      "content": "Starting a thread for costume progress. Post what you are working on, however unfinished it looks, it makes the deadline feel less lonely.",
+      "created_days_ago": 9,
+      "status": null,
+      "likes": [
+        "arif",
+        "farah",
+        "kahhoe",
+        "nadia",
+        "shuhao",
+        "weijie",
+        "xiaoyu"
+      ],
+      "shares": [
+        "meiling",
+        "nadia"
+      ]
+    },
+    {
+      "key": "club-feedback",
+      "author": "daniel",
+      "title": "Feedback on the event schedule",
+      "content": "Most events land on weekday evenings, which is difficult for anyone commuting. Could a few of the bigger ones move to weekends?",
+      "created_days_ago": 3,
+      "status": null,
+      "likes": [
+        "aisyah",
+        "amir",
+        "junyi"
+      ],
+      "shares": [
+        "xiaoyu"
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "post": "countdown",
+      "author": "junyi",
+      "content": "I have a spare sheet of 10mm foam, it is yours. Bring the snacks.",
+      "created_days_ago": 24
+    },
+    {
+      "post": "countdown",
+      "author": "meiling",
+      "content": "Please post progress photos, the helmet looked great last week.",
+      "created_days_ago": 23
+    },
+    {
+      "post": "supplies",
+      "author": "priya",
+      "content": "Good call on the reference sheet, I completely forgot mine last time.",
+      "created_days_ago": 18
+    },
+    {
+      "post": "amv-lineup",
+      "author": "shurui",
+      "content": "Which one used the Demon Slayer soundtrack? That transition was clean.",
+      "created_days_ago": 11
+    },
+    {
+      "post": "amv-lineup",
+      "author": "amir",
+      "content": "Getting there an hour early, seats filled up fast last year.",
+      "created_days_ago": 10
+    },
+    {
+      "post": "season",
+      "author": "arif",
+      "content": "Still working through One Piece, so ask me again in about two years.",
+      "created_days_ago": 7
+    },
+    {
+      "post": "season",
+      "author": "xiaoyu",
+      "content": "Chainsaw Man for me, though I am one episode behind.",
+      "created_days_ago": 7
+    },
+    {
+      "post": "marathon-photos",
+      "author": "shuhao",
+      "content": "The group shot at 4am is going straight into the club recap.",
+      "created_days_ago": 4
+    },
+    {
+      "post": "ghibli-recs",
+      "author": "nadia",
+      "content": "Start quiet and end loud, otherwise everyone leaves during the slow one.",
+      "created_days_ago": 21
+    },
+    {
+      "post": "ghibli-recs",
+      "author": "daniel",
+      "content": "Whichever one you pick, please keep the subtitles on.",
+      "created_days_ago": 20
+    },
+    {
+      "post": "figure-first-try",
+      "author": "weijie",
+      "content": "Thinning ratio took me about five figures to get right, you are ahead of schedule.",
+      "created_days_ago": 16
+    },
+    {
+      "post": "dance-practice",
+      "author": "nadia",
+      "content": "Joining this week if my lab finishes on time.",
+      "created_days_ago": 15
+    },
+    {
+      "post": "dance-practice",
+      "author": "priya",
+      "content": "Formation practice would help, we keep drifting on the chorus.",
+      "created_days_ago": 14
+    },
+    {
+      "post": "sports-day-recap",
+      "author": "arif",
+      "content": "Third place with two drops is genuinely impressive.",
+      "created_days_ago": 75
+    },
+    {
+      "post": "orchestra-preview",
+      "author": "aisyah",
+      "content": "Now I am annoyed I have a class that evening.",
+      "created_days_ago": 14
+    },
+    {
+      "post": "swap-haul",
+      "author": "kahhoe",
+      "content": "Save me anything sports related, I will trade you two art books.",
+      "created_days_ago": 13
+    },
+    {
+      "post": "swap-haul",
+      "author": "rajesh",
+      "content": "Are you bringing the volumes you mentioned last month?",
+      "created_days_ago": 13
+    },
+    {
+      "post": "rpg-setup",
+      "author": "daniel",
+      "content": "Signing up. Do we need to bring dice?",
+      "created_days_ago": 12
+    },
+    {
+      "post": "design-talk-notes",
+      "author": "junyi",
+      "content": "Sharing these with the workshop group, thanks for writing them up.",
+      "created_days_ago": 57
+    },
+    {
+      "post": "prop-materials",
+      "author": "kahhoe",
+      "content": "Contact cement in a closed workshop is going to be an experience.",
+      "created_days_ago": 10
+    },
+    {
+      "post": "trivia-warmup",
+      "author": "shurui",
+      "content": "Got four out of ten today, this is going badly.",
+      "created_days_ago": 9
+    },
+    {
+      "post": "trivia-warmup",
+      "author": "meiling",
+      "content": "The opening theme ones are unfair and I love them.",
+      "created_days_ago": 9
+    },
+    {
+      "post": "language-corner-invite",
+      "author": "farah",
+      "content": "This is the reassurance I needed, see you Thursday.",
+      "created_days_ago": 8
+    },
+    {
+      "post": "model-kit-tools",
+      "author": "weijie",
+      "content": "Learned this the hard way on my last kit.",
+      "created_days_ago": 7
+    },
+    {
+      "post": "karaoke-songlist",
+      "author": "daniel",
+      "content": "Removing mine, apparently I picked the popular one.",
+      "created_days_ago": 6
+    },
+    {
+      "post": "karaoke-songlist",
+      "author": "xiaoyu",
+      "content": "Nine people is a choir at that point, just do it together.",
+      "created_days_ago": 6
+    },
+    {
+      "post": "career-panel-questions",
+      "author": "nadia",
+      "content": "Ask about portfolios too, that comes up constantly.",
+      "created_days_ago": 5
+    },
+    {
+      "post": "new-member-intro",
+      "author": "amir",
+      "content": "This is how I met everyone here last year.",
+      "created_days_ago": 4
+    },
+    {
+      "post": "photo-tips",
+      "author": "priya",
+      "content": "Bringing a reflector, mine is collapsible if anyone needs to share.",
+      "created_days_ago": 19
+    },
+    {
+      "post": "quiz-team",
+      "author": "daniel",
+      "content": "Cowboy Bebop era is my whole personality, count me in.",
+      "created_days_ago": 12
+    },
+    {
+      "post": "culture-day-food",
+      "author": "aisyah",
+      "content": "Thank you for confirming this, it makes planning much easier.",
+      "created_days_ago": 20
+    },
+    {
+      "post": "culture-day-food",
+      "author": "farah",
+      "content": "Taiyaki queue is going to be enormous.",
+      "created_days_ago": 20
+    },
+    {
+      "post": "amv-editing",
+      "author": "shuhao",
+      "content": "Agreed, the winning entry two years ago was edited on a laptop.",
+      "created_days_ago": 22
+    },
+    {
+      "post": "volunteer-call",
+      "author": "weijie",
+      "content": "Putting my name down for the Ghibli night.",
+      "created_days_ago": 25
+    },
+    {
+      "post": "volunteer-call",
+      "author": "rajesh",
+      "content": "Can help with the registration desk on Culture Day.",
+      "created_days_ago": 25
+    },
+    {
+      "post": "cosplay-progress",
+      "author": "amir",
+      "content": "Half a helmet and a lot of regret, but it is progress.",
+      "created_days_ago": 8
+    },
+    {
+      "post": "cosplay-progress",
+      "author": "farah",
+      "content": "Wig styling stage, which is my least favourite stage.",
+      "created_days_ago": 8
+    },
+    {
+      "post": "club-feedback",
+      "author": "admin",
+      "content": "Noted, we are looking at weekend slots for the February events.",
+      "created_days_ago": 2
+    },
+    {
+      "post": "club-feedback",
+      "author": "rajesh",
+      "content": "Would make a real difference for those of us off campus.",
+      "created_days_ago": 2
+    }
+  ]
+}

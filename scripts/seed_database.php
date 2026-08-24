@@ -5,8 +5,9 @@ declare(strict_types=1);
 // Database seed script.
 //
 // Rebuilds every collection this project reads and writes, using the exact
-// document shape the API endpoints expect, then fills them with sample data so
-// the site is usable straight after a fresh MongoDB setup.
+// document shape the API endpoints expect, then fills them with the sample
+// content in seed_data.json so the site is usable straight after a fresh
+// MongoDB setup.
 //
 // Run it from the project root with the CLI PHP that has the mongodb extension:
 //
@@ -33,6 +34,20 @@ $collectionNames = [
     'postComments',
     'postShares',
 ];
+
+// Load the seed content. Keeping it in JSON leaves this file as logic only.
+$seedFile = __DIR__ . '/seed_data.json';
+$seedJson = @file_get_contents($seedFile);
+
+if ($seedJson === false) {
+    die("Cannot read seed data file: {$seedFile}\n");
+}
+
+$seedData = json_decode($seedJson, true);
+
+if (!is_array($seedData)) {
+    die("Seed data file is not valid JSON: {$seedFile}\n");
+}
 
 // Never overwrite a database that already holds records unless it was asked for.
 $existingCounts = [];
@@ -62,103 +77,35 @@ foreach ($collectionNames as $collectionName) {
 
 $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
-// Build a BSON timestamp relative to the moment the script runs.
-function stamp(DateTimeImmutable $base, string $modify): MongoDB\BSON\UTCDateTime
+// The seed data stores ages as whole days back from now, so every run produces
+// timestamps that stay sensibly spaced relative to the current date.
+function daysAgo(DateTimeImmutable $base, int $days, int $extraHours = 0): MongoDB\BSON\UTCDateTime
 {
-    return new MongoDB\BSON\UTCDateTime($base->modify($modify));
+    $moment = $base->modify('-' . max(0, $days) . ' days');
+
+    if ($extraHours !== 0) {
+        $moment = $moment->modify('+' . $extraHours . ' hours');
+    }
+
+    return new MongoDB\BSON\UTCDateTime($moment);
 }
 
 // ---------------------------------------------------------------------------
 // users
 // ---------------------------------------------------------------------------
 
-// Passwords are written through password_hash(), exactly like api/auth/register.php,
-// so api/auth/login.php can verify them with password_verify().
-$userSeeds = [
-    'admin' => [
-        'username' => 'Event Admin',
-        'email' => 'admin@taylors.edu.my',
-        'password' => 'Admin1234',
-        'role' => 'admin',
-        'anime_interest' => 'Event Management',
-        'telephone' => 60123456789,
-        'registered' => '-150 days',
-    ],
-    'amir' => [
-        'username' => 'Amir Reza',
-        'email' => 'amir.reza@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Attack on Titan',
-        'telephone' => 60129876543,
-        'registered' => '-140 days',
-    ],
-    'junyi' => [
-        'username' => 'Zhang JunYi',
-        'email' => 'zhang.junyi@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Jujutsu Kaisen',
-        'telephone' => 60125550111,
-        'registered' => '-138 days',
-    ],
-    'shuhao' => [
-        'username' => 'Yang Shuhao',
-        'email' => 'yang.shuhao@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'One Piece',
-        'telephone' => 60125550222,
-        'registered' => '-135 days',
-    ],
-    'shurui' => [
-        'username' => 'Yang Shurui',
-        'email' => 'yang.shurui@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Demon Slayer',
-        'telephone' => 60125550333,
-        'registered' => '-133 days',
-    ],
-    'meiling' => [
-        'username' => 'Tan Mei Ling',
-        'email' => 'tan.meiling@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Spy x Family',
-        'telephone' => 60125550444,
-        'registered' => '-96 days',
-    ],
-    'arif' => [
-        'username' => 'Muhammad Arif',
-        'email' => 'muhammad.arif@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Naruto',
-        'telephone' => 60125550555,
-        'registered' => '-74 days',
-    ],
-    'priya' => [
-        'username' => 'Priya Nair',
-        'email' => 'priya.nair@sd.taylors.edu.my',
-        'password' => 'Student1234',
-        'role' => 'user',
-        'anime_interest' => 'Your Name',
-        'telephone' => 60125550666,
-        'registered' => '-52 days',
-    ],
-];
-
 $users = $db->selectCollection('users');
 $userIds = [];
 $userDocuments = [];
 
-foreach ($userSeeds as $key => $seed) {
+foreach ($seedData['users'] as $seed) {
     $objectId = new MongoDB\BSON\ObjectId();
     $userId = (string) $objectId;
-    $userIds[$key] = $userId;
-    $createdAt = stamp($now, $seed['registered']);
+    $userIds[$seed['key']] = $userId;
+    $createdAt = daysAgo($now, $seed['registered_days_ago']);
 
+    // Passwords go through password_hash() exactly like api/auth/register.php,
+    // so api/auth/login.php can verify them with password_verify().
     // avatar_url stays empty because the frontend falls back to its own default image.
     $userDocuments[] = [
         '_id' => $objectId,
@@ -181,126 +128,22 @@ $users->insertMany($userDocuments);
 // events and registrations
 // ---------------------------------------------------------------------------
 
-// joined/cancelled hold user keys; the registration documents are generated from them,
-// so the joined counts shown on event cards always match the registrations collection.
-$eventSeeds = [
-    'cosplay-night' => [
-        'title' => 'Anime Cosplay Night 2026',
-        'category' => 'Cosplay',
-        'description' => 'Dress up as your favourite anime character and walk the runway. Prizes for best costume, best group, and best handmade prop.',
-        'event_date' => '2026-09-18',
-        'event_time' => '19:00',
-        'location' => "Grand Hall, Taylor's Lakeside Campus",
-        'capacity' => 100,
-        'created' => '-40 days',
-        'joined' => ['amir', 'junyi', 'shuhao', 'meiling', 'arif'],
-        'cancelled' => [],
-    ],
-    'manga-workshop' => [
-        'title' => 'Manga Drawing Workshop',
-        'category' => 'Workshop',
-        'description' => 'A hands-on session covering panel layout, inking, and screentones. Materials are provided, no drawing experience needed.',
-        'event_date' => '2026-09-26',
-        'event_time' => '14:00',
-        'location' => 'Design Studio, Block D',
-        'capacity' => 30,
-        'created' => '-36 days',
-        'joined' => ['shurui', 'priya', 'junyi'],
-        'cancelled' => ['arif'],
-    ],
-    'amv-festival' => [
-        'title' => 'Anime Music Video Festival',
-        'category' => 'Music',
-        'description' => "A screening night for student-made AMVs, followed by live voting and a short editing talk from last year's winner.",
-        'event_date' => '2026-10-03',
-        'event_time' => '18:30',
-        'location' => 'Auditorium 1',
-        'capacity' => 5,
-        'created' => '-30 days',
-        'joined' => ['amir', 'junyi', 'shuhao', 'shurui', 'meiling'],
-        'cancelled' => [],
-    ],
-    'culture-day' => [
-        'title' => 'Japanese Culture Day',
-        'category' => 'Culture',
-        'description' => 'Try calligraphy, origami, and a tea ceremony demonstration, with a Japanese street-food corner running all afternoon.',
-        'event_date' => '2026-10-11',
-        'event_time' => '10:00',
-        'location' => 'Student Life Centre',
-        'capacity' => 80,
-        'created' => '-27 days',
-        'joined' => ['priya', 'arif'],
-        'cancelled' => [],
-    ],
-    'movie-marathon' => [
-        'title' => 'Anime Movie Marathon',
-        'category' => 'Screening',
-        'description' => 'An overnight screening of three classic anime films, with free popcorn and a discussion session between each showing.',
-        'event_date' => '2026-07-25',
-        'event_time' => '20:00',
-        'location' => 'Lecture Theatre 3',
-        'capacity' => 50,
-        'status' => 'Closed',
-        'created' => '-70 days',
-        'updated' => '-26 days',
-        'joined' => ['amir', 'meiling', 'priya'],
-        'cancelled' => [],
-    ],
-    'photography' => [
-        'title' => 'Cosplay Photography Session',
-        'category' => 'Photography',
-        'description' => 'Bring your costume and camera to a guided outdoor shoot around the lake. Lighting gear and a photographer mentor are on site.',
-        'event_date' => '2026-10-24',
-        'event_time' => '16:00',
-        'location' => 'Campus Lakeside Park',
-        'capacity' => 25,
-        'created' => '-21 days',
-        'joined' => ['shuhao'],
-        'cancelled' => [],
-    ],
-    'anime-quiz' => [
-        'title' => 'Anime Quiz Championship',
-        'category' => 'Competition',
-        'description' => 'Teams of three compete across four rounds of anime trivia, from opening themes to obscure side characters.',
-        'event_date' => '2026-11-07',
-        'event_time' => '15:00',
-        'location' => 'Seminar Room 2',
-        'capacity' => 40,
-        'created' => '-14 days',
-        'joined' => ['junyi', 'shurui', 'arif'],
-        'cancelled' => ['meiling'],
-    ],
-    'game-night' => [
-        'title' => 'Otaku Game Night',
-        'category' => 'Games',
-        'description' => 'A casual evening of anime fighting games and rhythm games on the big screen.',
-        'event_date' => '2026-11-21',
-        'event_time' => '18:00',
-        'location' => 'Recreation Room',
-        'capacity' => 60,
-        'status' => 'Deleted',
-        'created' => '-11 days',
-        'deleted' => '-4 days',
-        'joined' => [],
-        'cancelled' => [],
-    ],
-];
-
+// joined/cancelled hold user keys, and the registration documents are generated
+// from them, so the joined counts shown on event cards always match the
+// registrations collection.
 $events = $db->selectCollection('events');
 $registrations = $db->selectCollection('registrations');
 $eventDocuments = [];
 $registrationDocuments = [];
 
-foreach ($eventSeeds as $seed) {
+foreach ($seedData['events'] as $seed) {
     $objectId = new MongoDB\BSON\ObjectId();
     $eventId = (string) $objectId;
+    $createdDaysAgo = $seed['created_days_ago'];
 
-    $joinedCount = count($seed['joined']);
-    $capacity = $seed['capacity'];
-
-    // A seeded event that is already at capacity has to carry the same Full status
-    // that api/registrations/join.php would have written.
-    $status = $seed['status'] ?? ($joinedCount >= $capacity ? 'Full' : 'Upcoming');
+    // An event seeded at capacity has to carry the same Full status that
+    // api/registrations/join.php would have written.
+    $status = $seed['status'] ?? (count($seed['joined']) >= $seed['capacity'] ? 'Full' : 'Upcoming');
 
     $eventDocument = [
         '_id' => $objectId,
@@ -311,20 +154,16 @@ foreach ($eventSeeds as $seed) {
         'event_date' => $seed['event_date'],
         'event_time' => $seed['event_time'],
         'location' => $seed['location'],
-        'capacity' => $capacity,
+        'capacity' => $seed['capacity'],
         'image_url' => '',
         'status' => $status,
         'created_by' => $userIds['admin'],
-        'created_at' => stamp($now, $seed['created']),
+        'created_at' => daysAgo($now, $createdDaysAgo),
     ];
 
-    if (isset($seed['updated'])) {
-        $eventDocument['updated_at'] = stamp($now, $seed['updated']);
-    }
-
     // Soft-deleted events keep the audit fields written by api/admin/events/delete.php.
-    if (isset($seed['deleted'])) {
-        $eventDocument['deleted_at'] = stamp($now, $seed['deleted']);
+    if ($status === 'Deleted') {
+        $eventDocument['deleted_at'] = daysAgo($now, $createdDaysAgo - 7);
         $eventDocument['deleted_by'] = $userIds['admin'];
     }
 
@@ -340,24 +179,25 @@ foreach ($eventSeeds as $seed) {
             'registration_id' => (string) $registrationObjectId,
             'user_id' => $userIds[$userKey],
             'event_id' => $eventId,
-            'registration_date' => stamp($now, $seed['created'] . ' +' . $offset . ' days'),
+            'registration_date' => daysAgo($now, $createdDaysAgo - $offset),
             'status' => 'joined',
         ];
 
         $offset++;
     }
 
-    // Cancelled registrations stay in the collection so the join endpoint can reactivate them.
+    // Cancelled registrations stay in the collection so the join endpoint can
+    // reactivate them instead of inserting a duplicate.
     foreach ($seed['cancelled'] as $userKey) {
         $registrationObjectId = new MongoDB\BSON\ObjectId();
-        $cancelledAt = stamp($now, $seed['created'] . ' +' . ($offset + 2) . ' days');
+        $cancelledAt = daysAgo($now, $createdDaysAgo - $offset - 2);
 
         $registrationDocuments[] = [
             '_id' => $registrationObjectId,
             'registration_id' => (string) $registrationObjectId,
             'user_id' => $userIds[$userKey],
             'event_id' => $eventId,
-            'registration_date' => stamp($now, $seed['created'] . ' +' . $offset . ' days'),
+            'registration_date' => daysAgo($now, $createdDaysAgo - $offset),
             'status' => 'cancelled',
             'cancelled_at' => $cancelledAt,
             'updated_at' => $cancelledAt,
@@ -374,70 +214,6 @@ $registrations->insertMany($registrationDocuments);
 // posts, likes, comments, and shares
 // ---------------------------------------------------------------------------
 
-$postSeeds = [
-    'countdown' => [
-        'author' => 'amir',
-        'title' => 'Cosplay Night countdown has started',
-        'content' => 'Three weeks left before Cosplay Night and my armour is still half painted. If anyone has spare EVA foam, I will trade snacks for it.',
-        'created' => '-25 days',
-        'likes' => ['junyi', 'shuhao', 'meiling', 'priya'],
-        'shares' => ['junyi', 'arif'],
-    ],
-    'supplies' => [
-        'author' => 'junyi',
-        'title' => 'What to bring to the manga workshop',
-        'content' => 'The studio provides pens and paper, but bring your own eraser and a reference sheet of the character you want to draw. It saves a lot of time.',
-        'created' => '-19 days',
-        'likes' => ['shurui', 'priya'],
-        'shares' => ['shurui'],
-    ],
-    'amv-lineup' => [
-        'author' => 'shuhao',
-        'title' => 'AMV Festival lineup is looking strong',
-        'content' => 'Watched a few of the submitted edits during rehearsal. The sync work this year is on another level, definitely worth getting a seat early.',
-        'created' => '-12 days',
-        'likes' => ['amir', 'junyi', 'shurui', 'meiling', 'arif'],
-        'shares' => ['amir', 'meiling', 'priya'],
-    ],
-    'season' => [
-        'author' => 'meiling',
-        'title' => 'Best anime of the season?',
-        'content' => 'Curious what everyone is watching right now. I have been rewatching Spy x Family between classes and it still holds up.',
-        'created' => '-8 days',
-        'likes' => ['priya', 'arif'],
-        'shares' => [],
-    ],
-    'marathon-photos' => [
-        'author' => 'priya',
-        'title' => 'Photos from the movie marathon',
-        'content' => 'Finally sorted through the shots from the overnight screening. Everyone looked exhausted by the third film but nobody left early.',
-        'created' => '-5 days',
-        'likes' => ['amir', 'meiling', 'shuhao'],
-        'shares' => ['amir'],
-    ],
-    'old-notice' => [
-        'author' => 'arif',
-        'title' => 'Old club notice',
-        'content' => 'Posted the wrong venue for the quiz night, please ignore this one.',
-        'created' => '-30 days',
-        'status' => 'deleted',
-        'deleted' => '-29 days',
-        'likes' => [],
-        'shares' => [],
-    ],
-];
-
-// Comments are listed separately so each one can carry its own author and timing.
-$commentSeeds = [
-    ['post' => 'countdown', 'author' => 'junyi', 'content' => 'I have a spare sheet of 10mm foam, it is yours. Bring the snacks.', 'created' => '-24 days'],
-    ['post' => 'countdown', 'author' => 'meiling', 'content' => 'Please post progress photos, the helmet looked great last week.', 'created' => '-23 days'],
-    ['post' => 'supplies', 'author' => 'priya', 'content' => 'Good call on the reference sheet, I completely forgot mine last time.', 'created' => '-18 days'],
-    ['post' => 'amv-lineup', 'author' => 'shurui', 'content' => 'Which one used the Demon Slayer soundtrack? That transition was clean.', 'created' => '-11 days'],
-    ['post' => 'amv-lineup', 'author' => 'amir', 'content' => 'Getting there an hour early, seats filled up fast last year.', 'created' => '-10 days'],
-    ['post' => 'season', 'author' => 'arif', 'content' => 'Still working through One Piece, so ask me again in about two years.', 'created' => '-7 days'],
-    ['post' => 'marathon-photos', 'author' => 'shuhao', 'content' => 'The group shot at 4am is going straight into the club recap.', 'created' => '-4 days'],
-];
-
 $posts = $db->selectCollection('posts');
 $postLikes = $db->selectCollection('postLikes');
 $postComments = $db->selectCollection('postComments');
@@ -449,11 +225,13 @@ $likeDocuments = [];
 $shareDocuments = [];
 $commentDocuments = [];
 
-foreach ($postSeeds as $key => $seed) {
+foreach ($seedData['posts'] as $seed) {
     $objectId = new MongoDB\BSON\ObjectId();
     $postId = (string) $objectId;
-    $postIds[$key] = $postId;
-    $createdAt = stamp($now, $seed['created']);
+    $postIds[$seed['key']] = $postId;
+    $createdDaysAgo = $seed['created_days_ago'];
+    $createdAt = daysAgo($now, $createdDaysAgo);
+    $status = $seed['status'] ?? 'active';
 
     $postDocument = [
         '_id' => $objectId,
@@ -464,12 +242,12 @@ foreach ($postSeeds as $key => $seed) {
         'image_url' => '',
         'created_at' => $createdAt,
         'updated_at' => $createdAt,
-        'status' => $seed['status'] ?? 'active',
+        'status' => $status,
     ];
 
     // Soft-deleted posts keep the audit fields written by api/posts/delete.php.
-    if (isset($seed['deleted'])) {
-        $deletedAt = stamp($now, $seed['deleted']);
+    if ($status === 'deleted') {
+        $deletedAt = daysAgo($now, $createdDaysAgo - 1);
         $postDocument['updated_at'] = $deletedAt;
         $postDocument['deleted_at'] = $deletedAt;
         $postDocument['deleted_by'] = $userIds[$seed['author']];
@@ -487,7 +265,7 @@ foreach ($postSeeds as $key => $seed) {
             'like_id' => (string) $likeObjectId,
             'post_id' => $postId,
             'user_id' => $userIds[$userKey],
-            'created_at' => stamp($now, $seed['created'] . ' +' . $offset . ' hours'),
+            'created_at' => daysAgo($now, $createdDaysAgo, $offset),
         ];
 
         $offset++;
@@ -501,16 +279,16 @@ foreach ($postSeeds as $key => $seed) {
             'share_id' => (string) $shareObjectId,
             'post_id' => $postId,
             'user_id' => $userIds[$userKey],
-            'created_at' => stamp($now, $seed['created'] . ' +' . $offset . ' hours'),
+            'created_at' => daysAgo($now, $createdDaysAgo, $offset),
         ];
 
         $offset++;
     }
 }
 
-foreach ($commentSeeds as $seed) {
+foreach ($seedData['comments'] as $seed) {
     $commentObjectId = new MongoDB\BSON\ObjectId();
-    $createdAt = stamp($now, $seed['created']);
+    $createdAt = daysAgo($now, $seed['created_days_ago']);
 
     $commentDocuments[] = [
         '_id' => $commentObjectId,
@@ -570,8 +348,8 @@ foreach ($collectionNames as $collectionName) {
 
 echo "\nSample accounts:\n";
 
-foreach ($userSeeds as $seed) {
-    printf("  %-5s  %-34s  %s\n", $seed['role'], $seed['email'], $seed['password']);
+foreach ($seedData['users'] as $seed) {
+    printf("  %-5s  %-36s  %s\n", $seed['role'], $seed['email'], $seed['password']);
 }
 
 echo "\nChange these passwords before showing the site to anyone outside the group.\n";
