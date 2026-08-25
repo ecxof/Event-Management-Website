@@ -76,12 +76,16 @@ $query = [
 $total = $events->countDocuments($query);
 $pagination = clampPagination($pagination, $total);
 
-// Events are listed in three groups, so the first page always opens on the events a
-// student can still act on:
+// Events are listed in four groups, so the first page always opens on the events a
+// student can still join:
 //
-//   0. still to come and open for registration (Upcoming or Full), soonest first
-//   1. still to come but Closed, soonest first
-//   2. already happened, newest first
+//   0. still to come and open for registration (Upcoming), soonest first
+//   1. still to come but at capacity (Full), soonest first
+//   2. still to come but Closed, soonest first
+//   3. already happened, newest first
+//
+// A Full event stays above a Closed one because cancelling a registration reopens it,
+// which api/registrations/cancel.php does by setting the status back to Upcoming.
 //
 // event_date is stored as a YYYY-MM-DD string, so comparing it against today's date as
 // a string is enough to tell a past event from an upcoming one. Comparing dates only,
@@ -121,10 +125,14 @@ $cursor = $events->aggregate([
                     'branches' => [
                         [
                             'case' => ['$lt' => ['$event_date', $today]],
-                            'then' => 2,
+                            'then' => 3,
                         ],
                         [
                             'case' => ['$eq' => ['$status', 'Closed']],
+                            'then' => 2,
+                        ],
+                        [
+                            'case' => ['$eq' => ['$status', 'Full']],
                             'then' => 1,
                         ],
                     ],
