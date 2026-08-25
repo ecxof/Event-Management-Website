@@ -76,14 +76,17 @@ $query = [
 $total = $events->countDocuments($query);
 $pagination = clampPagination($pagination, $total);
 
-// Events that already happened are pushed below the ones still to come, so the first
-// page opens on upcoming events instead of the oldest archived ones. Within each of
-// those two groups the order is still by date/time, with newer created records used as
-// a tie breaker.
+// Events are listed in three groups, so the first page always opens on the events a
+// student can still act on:
+//
+//   0. still to come and open for registration (Upcoming or Full), soonest first
+//   1. still to come but Closed, soonest first
+//   2. already happened, newest first
 //
 // event_date is stored as a YYYY-MM-DD string, so comparing it against today's date as
 // a string is enough to tell a past event from an upcoming one. Comparing dates only,
-// without the time, keeps an event that is running today at the top for the whole day.
+// without the time, keeps an event that is running today out of the past group for the
+// whole day.
 $today = (new DateTimeImmutable('now'))->format('Y-m-d');
 
 $cursor = $events->aggregate([
@@ -91,17 +94,58 @@ $cursor = $events->aggregate([
         '$match' => $query,
     ],
     [
+        // The stored date and time are fixed-width strings, so joining them produces a
+        // valid ISO 8601 value that can be turned into a real timestamp. Anything
+        // malformed falls back to the epoch and sorts to the end of its own group.
         '$addFields' => [
-            'is_past' => [
-                '$lt' => ['$event_date', $today],
+            'event_moment' => [
+                '$dateFromString' => [
+                    'dateString' => [
+                        '$concat' => [
+                            '$event_date',
+                            'T',
+                            ['$ifNull' => ['$event_time', '00:00']],
+                            ':00Z',
+                        ],
+                    ],
+                    'onError' => new MongoDB\BSON\UTCDateTime(0),
+                    'onNull' => new MongoDB\BSON\UTCDateTime(0),
+                ],
+            ],
+        ],
+    ],
+    [
+        '$addFields' => [
+            'sort_rank' => [
+                '$switch' => [
+                    'branches' => [
+                        [
+                            'case' => ['$lt' => ['$event_date', $today]],
+                            'then' => 2,
+                        ],
+                        [
+                            'case' => ['$eq' => ['$status', 'Closed']],
+                            'then' => 1,
+                        ],
+                    ],
+                    'default' => 0,
+                ],
+            ],
+            // Past events are negated so that one ascending sort still reads newest
+            // first for them, while the two upcoming groups stay soonest first.
+            'sort_key' => [
+                '$cond' => [
+                    'if' => ['$lt' => ['$event_date', $today]],
+                    'then' => ['$multiply' => [['$toLong' => '$event_moment'], -1]],
+                    'else' => ['$toLong' => '$event_moment'],
+                ],
             ],
         ],
     ],
     [
         '$sort' => [
-            'is_past' => 1,
-            'event_date' => 1,
-            'event_time' => 1,
+            'sort_rank' => 1,
+            'sort_key' => 1,
             'created_at' => -1,
         ],
     ],
