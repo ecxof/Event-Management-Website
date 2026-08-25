@@ -76,19 +76,42 @@ $query = [
 $total = $events->countDocuments($query);
 $pagination = clampPagination($pagination, $total);
 
-// Events are ordered by upcoming date/time, with newer created records used as a tie breaker.
-$cursor = $events->find(
-    $query,
+// Events that already happened are pushed below the ones still to come, so the first
+// page opens on upcoming events instead of the oldest archived ones. Within each of
+// those two groups the order is still by date/time, with newer created records used as
+// a tie breaker.
+//
+// event_date is stored as a YYYY-MM-DD string, so comparing it against today's date as
+// a string is enough to tell a past event from an upcoming one. Comparing dates only,
+// without the time, keeps an event that is running today at the top for the whole day.
+$today = (new DateTimeImmutable('now'))->format('Y-m-d');
+
+$cursor = $events->aggregate([
     [
-        'sort' => [
+        '$match' => $query,
+    ],
+    [
+        '$addFields' => [
+            'is_past' => [
+                '$lt' => ['$event_date', $today],
+            ],
+        ],
+    ],
+    [
+        '$sort' => [
+            'is_past' => 1,
             'event_date' => 1,
             'event_time' => 1,
             'created_at' => -1,
         ],
-        'skip' => $pagination['skip'],
-        'limit' => $pagination['limit'],
-    ]
-);
+    ],
+    [
+        '$skip' => $pagination['skip'],
+    ],
+    [
+        '$limit' => $pagination['limit'],
+    ],
+]);
 
 $eventList = [];
 
